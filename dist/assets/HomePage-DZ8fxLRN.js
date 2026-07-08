@@ -1,0 +1,108 @@
+import{c as r,r as i,u as b,j as e,L as S,B as j}from"./index-DZZ7pb-P.js";import{U as h,B as C,a as y,C as M,b as E,S as H}from"./utensils-ashgrc2X.js";/**
+ * @license lucide-react v0.383.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const u=r("ArrowRight",[["path",{d:"M5 12h14",key:"1ays0h"}],["path",{d:"m12 5 7 7-7 7",key:"xquz4c"}]]);/**
+ * @license lucide-react v0.383.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const R=r("ClipboardCheck",[["rect",{width:"8",height:"4",x:"8",y:"2",rx:"1",ry:"1",key:"tgr4d6"}],["path",{d:"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2",key:"116196"}],["path",{d:"m9 14 2 2 4-4",key:"df797q"}]]);/**
+ * @license lucide-react v0.383.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const v=r("LayoutGrid",[["rect",{width:"7",height:"7",x:"3",y:"3",rx:"1",key:"1g98yp"}],["rect",{width:"7",height:"7",x:"14",y:"3",rx:"1",key:"6d4xhi"}],["rect",{width:"7",height:"7",x:"14",y:"14",rx:"1",key:"nxv5o0"}],["rect",{width:"7",height:"7",x:"3",y:"14",rx:"1",key:"1bb6yr"}]]);/**
+ * @license lucide-react v0.383.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const A=r("Mail",[["rect",{width:"20",height:"16",x:"2",y:"4",rx:"2",key:"18n3k1"}],["path",{d:"m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7",key:"1ocrg3"}]]);/**
+ * @license lucide-react v0.383.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const z=r("MapPin",[["path",{d:"M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z",key:"2oe9fu"}],["circle",{cx:"12",cy:"10",r:"3",key:"ilqhr7"}]]);/**
+ * @license lucide-react v0.383.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const O=r("Menu",[["line",{x1:"4",x2:"20",y1:"12",y2:"12",key:"1e0a9i"}],["line",{x1:"4",x2:"20",y1:"6",y2:"6",key:"1owob3"}],["line",{x1:"4",x2:"20",y1:"18",y2:"18",key:"yk5zj1"}]]);/**
+ * @license lucide-react v0.383.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const L=r("Phone",[["path",{d:"M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z",key:"foiqr5"}]]);/**
+ * @license lucide-react v0.383.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const P=r("UserPlus",[["path",{d:"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2",key:"1yyitq"}],["circle",{cx:"9",cy:"7",r:"4",key:"nufk8"}],["line",{x1:"19",x2:"19",y1:"8",y2:"14",key:"1bvyxn"}],["line",{x1:"22",x2:"16",y1:"11",y2:"11",key:"1shjgl"}]]);/**
+ * @license lucide-react v0.383.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const U=r("X",[["path",{d:"M18 6 6 18",key:"1bl5f8"}],["path",{d:"m6 6 12 12",key:"d8bk6v"}]]),g=[{label:"Home",href:"/"},{label:"About",href:"/about"},{label:"Contact Us",href:"/#contactUs"},{label:"Announcements",href:"/#announcements"}];function I({activeLink:a="Home"}){const[n,l]=i.useState(!1),o=b();return e.jsxs("header",{className:"sticky top-0 z-50 bg-[#000080]/95 backdrop-blur-md border-b border-blue-800 shadow-lg transition-all duration-500",children:[e.jsx("div",{className:"max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",children:e.jsxs("div",{className:"flex items-center justify-between h-20",children:[e.jsxs(S,{to:"/",className:"flex items-center gap-3 group transition-all duration-300",children:[e.jsx("span",{className:"flex items-center justify-center w-11 h-11 rounded-xl bg-[#d4af37] text-[#00008B] shadow-md transition-all duration-300 group-hover:rotate-6 group-hover:scale-110",children:e.jsx(j,{size:22})}),e.jsx("span",{className:"font-bold text-lg tracking-wide text-white transition-colors duration-300 group-hover:text-[#d4af37]",children:"UniNest"})]}),e.jsx("nav",{className:"hidden md:flex items-center gap-10",children:g.map(s=>e.jsx("a",{href:s.href,className:`relative text-sm font-semibold transition-all duration-300 hover:scale-105
+                after:absolute after:left-0 after:-bottom-2 after:h-[2px]
+                after:bg-[#d4af37] after:transition-all after:duration-300
+                ${s.label===a?"text-[#d4af37] after:w-full":"text-white after:w-0 hover:text-[#d4af37] hover:after:w-full"}`,children:s.label},s.label))}),e.jsxs("div",{className:"hidden md:flex items-center gap-4",children:[e.jsx("button",{onClick:()=>o("/login"),className:`px-5 py-2.5 rounded-xl border-2 border-[#d4af37]
+              text-[#d4af37] font-semibold
+              transition-all duration-300
+              hover:bg-[#d4af37]
+              hover:text-[#00008B]
+              hover:scale-105`,children:"Login"}),e.jsx("button",{onClick:()=>o("/login"),className:`px-5 py-2.5 rounded-xl bg-[#d4af37]
+              text-[#00008B] font-semibold
+              transition-all duration-300
+              hover:bg-[#d4af37]
+              hover:scale-105
+              hover:shadow-xl`,children:"Register"})]}),e.jsx("button",{className:"md:hidden text-white p-2 transition-transform duration-300 hover:rotate-90",onClick:()=>l(!n),"aria-label":"Toggle menu",children:n?e.jsx(U,{size:28}):e.jsx(O,{size:28})})]})}),e.jsx("div",{className:`md:hidden overflow-hidden transition-all duration-500 ease-in-out ${n?"max-h-96 opacity-100":"max-h-0 opacity-0"}`,children:e.jsxs("div",{className:"bg-[#00008B] border-t border-blue-800 px-5 py-5",children:[e.jsx("nav",{className:"flex flex-col gap-5",children:g.map(s=>e.jsx("a",{href:s.href,onClick:()=>l(!1),className:`text-base font-medium transition-all duration-300 hover:translate-x-2 ${s.label===a?"text-[#d4af37]":"text-white hover:text-[#d4af37]"}`,children:s.label},s.label))}),e.jsxs("div",{className:"flex gap-3 mt-6",children:[e.jsx("button",{onClick:()=>{o("/login"),l(!1)},className:`flex-1 py-2.5 rounded-xl border-2 border-[#d4af37]
+              text-[#d4af37] font-semibold
+              transition-all duration-300
+              hover:bg-[#d4af37]
+              hover:text-[#00008B]`,children:"Login"}),e.jsx("button",{onClick:()=>{o("/login"),l(!1)},className:`flex-1 py-2.5 rounded-xl bg-[#d4af37]
+              text-[#00008B] font-semibold
+              transition-all duration-300
+              hover:bg-[#d4af37]`,children:"Register"})]})]})})]})}const B=[{label:"About",href:"/about"},{label:"FAQ",href:"#"},{label:"Privacy Policy",href:"#"},{label:"Terms and Conditions",href:"#"}];function T(){return e.jsxs("footer",{className:"bg-[#000080] text-slate-300",children:[e.jsx("div",{className:"max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-12 sm:py-14",children:e.jsxs("div",{className:`
+          grid 
+          grid-cols-1 
+          sm:grid-cols-2 
+          lg:grid-cols-3 
+          gap-10
+        `,children:[e.jsxs("div",{className:"text-center sm:text-left",children:[e.jsxs("div",{className:"flex items-center justify-center sm:justify-start gap-2 mb-4",children:[e.jsx("span",{className:"flex items-center justify-center w-9 h-9 rounded-lg bg-white/10",children:e.jsx(j,{size:20,className:"text-white"})}),e.jsx("span",{className:"font-semibold text-lg text-white",children:"UniNest"})]}),e.jsx("p",{className:"text-sm text-slate-400 leading-relaxed max-w-xs mx-auto sm:mx-0",children:"One Platform. Complete Hostel Management."})]}),e.jsxs("div",{className:"text-center sm:text-left",children:[e.jsx("h4",{className:"text-white font-semibold mb-4",children:"Quick Links"}),e.jsx("ul",{className:"space-y-3 text-sm",children:B.map(a=>e.jsx("li",{children:e.jsx("a",{href:a.href,className:"hover:text-white transition-colors",children:a.label})},a.label))})]}),e.jsxs("div",{className:"text-center sm:text-left",children:[e.jsx("h4",{className:"text-white font-semibold mb-4",children:"Contact Us"}),e.jsxs("ul",{className:"space-y-4 text-sm",children:[e.jsxs("li",{className:`
+                flex 
+                flex-col 
+                sm:flex-row 
+                items-center 
+                sm:items-start 
+                gap-2 
+                sm:gap-3
+              `,children:[e.jsx(z,{size:17,className:"shrink-0 text-slate-400 mt-1"}),e.jsx("span",{className:"leading-relaxed",children:"Department of Computer Science, Faculty of Science, University of Ruhuna."})]}),e.jsxs("li",{className:`
+                flex 
+                items-center 
+                justify-center 
+                sm:justify-start 
+                gap-3
+              `,children:[e.jsx(L,{size:16,className:"shrink-0 text-slate-400"}),e.jsx("span",{children:"+94 11 223 4455"})]}),e.jsxs("li",{className:`
+                flex 
+                items-center 
+                justify-center 
+                sm:justify-start 
+                gap-3
+              `,children:[e.jsx(A,{size:16,className:"shrink-0 text-slate-400"}),e.jsx("span",{className:"break-all",children:"uninest@gmail.com"})]})]})]})]})}),e.jsx("div",{className:"border-t border-white/10",children:e.jsx("div",{className:`
+          max-w-7xl 
+          mx-auto 
+          px-5 
+          sm:px-6 
+          lg:px-8 
+          py-5 
+          flex 
+          flex-col 
+          sm:flex-row 
+          items-center 
+          justify-center 
+          gap-2 
+          text-center
+          text-xs 
+          text-slate-500
+        `,children:e.jsxs("p",{children:["© ",new Date().getFullYear()," University Hostel Management System.",e.jsx("span",{className:"block sm:inline sm:ml-1",children:"All rights reserved."})]})})})]})}function x({children:a,className:n=""}){const l=i.useRef(null),[o,s]=i.useState(!1);return i.useEffect(()=>{const d=l.current;if(!d)return;const t=new IntersectionObserver(([c])=>{c.isIntersecting&&(s(!0),t.unobserve(d))},{threshold:.15});return t.observe(d),()=>t.disconnect()},[]),e.jsx("div",{ref:l,className:`transition-all duration-700 ease-out ${o?"opacity-100 translate-y-0":"opacity-0 translate-y-8"} ${n}`,children:a})}const D="/assets/herobg-Dj68HEqK.jpg",F="/assets/hostel01-DO03dfx6.jpg",q=[{name:"Meddawaththa Boy's Hostel",note:"Allocated for 1st year male students",icon:h},{name:"Eliyakanda New Boy's Hostel",note:"For 2nd year, 3rd year and 4th year Male students",icon:h},{name:"Eliyakanda New Girl's Hostel",note:"For 2nd year, 3rd year and 4th year Female students",icon:h},{name:"Wellamadama Girl's Hostel",note:"Mainly for 1st year girls",icon:h}],V=[{title:"Room Allocation",desc:"Automated smart allocation based on your faculty and preferences.",icon:C},{title:"Online Payments",desc:"Pay hostel fees and settle damage fines easily with a secure and convenient online payment system.",icon:v},{title:"Canteen Services",desc:"View daily menus, available meals, and food details from the hostel canteen.",icon:y},{title:"Maintenance & Complaints",desc:"Report maintenance issues, submit complaints, and track repairing activities for a better hostel experience.",icon:P}],W=[{title:"Smart Room Management",desc:"View room allocations and hostel details through an organized floor-wise management system.",icon:v},{title:"Maintenance Support",desc:"Submit maintenance requests online and track repair progress with real-time updates.",icon:R},{title:"Secure Online Payments",desc:"Pay hostel fees, damage charges, and late payment fines securely in one place.",icon:M},{title:"Daily Canteen Menu",desc:"Stay updated with breakfast, lunch, and dinner menus published by hostel canteen staff.",icon:y},{title:"Smart Notifications",desc:"Receive important reminders for payments, fines, announcements, and maintenance updates.",icon:E},{title:"Efficient Hostel Management",desc:"A centralized platform connecting students and hostel staff for transparent and efficient operations.",icon:H}],f=[{value:1500,suffix:"+",label:"ACTIVE STUDENTS"},{value:4,suffix:"",label:"MAJOR HOSTELS"},{value:600,suffix:"+",label:"READY ROOMS"},{value:24,suffix:"/7",label:"STAFF SUPPORT"}],Y=[{tag:"Hostel Notice",tagColor:"bg-slate-100 text-slate-600",date:"Oct 24, 2024",title:"Semester Room Re-allocation Schedule",desc:"Detailed schedule for the upcoming semester room re-allocations is now available for all..."},{tag:"Event",tagColor:"bg-amber-100 text-amber-700",date:"Oct 20, 2024",title:"Annual Hostel Cultural Night 2024",desc:"Join us for a night of talent, food, and culture at the university main grounds this coming..."},{tag:"Maintenance Notice",tagColor:"bg-rose-100 text-rose-600",date:"Oct 18, 2024",title:"Water Supply Interruption - Wellamadama",desc:"Emergency pipe maintenance scheduled for Wellamadama block C between 10:00 AM..."}];function J(){const a=b(),n=i.useRef(null),[l,o]=i.useState(!1),[s,d]=i.useState(f.map(()=>0));return i.useEffect(()=>{const t=new IntersectionObserver(([c])=>{c.isIntersecting&&(o(!0),t.disconnect())},{threshold:.4});return n.current&&t.observe(n.current),()=>t.disconnect()},[]),i.useEffect(()=>{l&&f.forEach((t,c)=>{let m=0;const N=t.value/(1800/20),w=setInterval(()=>{m+=N,m>=t.value&&(m=t.value,clearInterval(w)),d(k=>{const p=[...k];return p[c]=Math.floor(m),p})},20)})},[l]),e.jsxs("div",{className:"min-h-screen bg-white",children:[e.jsx(I,{activeLink:"Home"}),e.jsxs("section",{className:"relative min-h-[600px] flex items-center overflow-hidden",children:[e.jsxs("div",{className:"absolute inset-0",children:[e.jsx("img",{src:D,alt:"",className:"w-full h-full object-cover blur-[2px] scale-105"}),e.jsx("div",{className:"absolute inset-0 bg-black/55"})]}),e.jsxs("div",{className:"relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 grid lg:grid-cols-2 gap-12 items-start animate-fadeIn",children:[e.jsxs("div",{children:[e.jsx("h1",{className:"text-4xl sm:text-5xl font-bold text-white leading-tight tracking-tight",children:"Everything You Need for Hostel Living"}),e.jsx("p",{className:"mt-5 text-white/80 leading-relaxed max-w-md",children:"Manage your accommodation, payments, maintenance requests, and daily hostel services from one convenient platform."}),e.jsxs("div",{className:"flex flex-wrap gap-3 mt-8",children:[e.jsxs("button",{className:"inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-white text-slate-900 text-sm font-semibold hover:bg-white/90 transition-all hover:scale-105",children:["Explore Hostels ",e.jsx(u,{size:16})]}),e.jsx("button",{onClick:()=>a("/login"),className:"px-5 py-3 rounded-lg border-2 border-white/40 text-white text-sm font-semibold hover:bg-white/10 transition-all hover:scale-105",children:"Student Login"})]})]}),e.jsxs("div",{children:[e.jsx("div",{className:"flex items-center justify-between mb-4",children:e.jsx("h2",{className:"font-semibold text-white/90",children:"Select Your Hostel"})}),e.jsx("div",{className:"grid grid-cols-2 gap-4",children:q.map(t=>e.jsxs("div",{className:"bg-white/10 backdrop-blur-md rounded-xl border border-white/20 p-4 hover:bg-white/20 transition-all",children:[e.jsx("span",{className:"flex items-center justify-center w-9 h-9 rounded-lg bg-white/20 text-white mb-3",children:e.jsx(t.icon,{size:17})}),e.jsx("p",{className:"font-medium text-white text-sm",children:t.name}),e.jsx("p",{className:"text-xs text-white/70 mt-0.5",children:t.note}),e.jsxs("a",{href:"#",className:"inline-flex items-center gap-1 text-xs font-medium text-white/80 mt-3 hover:text-white",children:["Select ",e.jsx(u,{size:12})]})]},t.name))})]})]})]}),e.jsx(x,{children:e.jsxs("section",{className:"max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16",children:[e.jsxs("div",{className:"text-center mb-12",children:[e.jsx("h2",{className:"text-2xl sm:text-3xl font-bold text-slate-900",children:"Integrated Services"}),e.jsx("div",{className:"w-14 h-1 bg-amber-500 mx-auto mt-3 rounded-full"})]}),e.jsx("div",{className:"grid sm:grid-cols-2 lg:grid-cols-4 gap-6",children:V.map(t=>e.jsxs("div",{className:"border border-slate-200 rounded-xl p-6 text-center hover:shadow-md transition-shadow",children:[e.jsx("span",{className:"inline-flex items-center justify-center w-11 h-11 rounded-lg bg-slate-900 text-white mb-4",children:e.jsx(t.icon,{size:19})}),e.jsx("h3",{className:"font-semibold text-slate-900 mb-1.5",children:t.title}),e.jsx("p",{className:"text-sm text-slate-500 leading-relaxed",children:t.desc})]},t.title))})]})}),e.jsx(x,{children:e.jsx("section",{className:"bg-slate-50",children:e.jsxs("div",{className:"max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 grid lg:grid-cols-2 gap-12 items-center",children:[e.jsx("div",{className:"aspect-[4/3] rounded-2xl overflow-hidden",children:e.jsx("img",{src:F,alt:"Hostel",className:"w-full h-full object-cover"})}),e.jsxs("div",{children:[e.jsx("h2",{className:"text-2xl sm:text-3xl font-bold text-slate-900 mb-3",children:"Why Choose UniNest?"}),e.jsx("p",{className:"text-slate-600 mb-8 leading-relaxed",children:"Designed to simplify hostel management for students and university staff by providing a secure, transparent, and fully digital platform for accommodation, communication, and daily hostel services."}),e.jsx("div",{className:"grid sm:grid-cols-2 gap-x-8 gap-y-6",children:W.map(t=>e.jsxs("div",{className:"flex items-start gap-3",children:[e.jsx("span",{className:"flex items-center justify-center w-9 h-9 rounded-lg bg-white border border-slate-200 text-amber-600 shrink-0",children:e.jsx(t.icon,{size:16})}),e.jsxs("div",{children:[e.jsx("p",{className:"font-medium text-slate-900 text-sm",children:t.title}),e.jsx("p",{className:"text-xs text-slate-500 mt-0.5",children:t.desc})]})]},t.title))})]})]})})}),e.jsx(x,{children:e.jsx("section",{ref:n,className:"bg-slate-900",children:e.jsx("div",{className:"max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-2 sm:grid-cols-4 gap-8 text-center",children:f.map((t,c)=>e.jsxs("div",{children:[e.jsxs("p",{className:"text-3xl sm:text-4xl font-bold text-amber-400",children:[s[c],t.suffix]}),e.jsx("p",{className:"text-xs tracking-wide text-slate-400 mt-1",children:t.label})]},t.label))})})}),e.jsx(x,{children:e.jsxs("section",{className:"max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16",children:[e.jsxs("div",{className:"flex items-end justify-between mb-10",children:[e.jsxs("div",{children:[e.jsx("h2",{className:"text-2xl sm:text-3xl font-bold text-slate-900",children:"Recent Announcements"}),e.jsx("p",{className:"text-slate-500 text-sm mt-1",children:"Stay updated with the latest news and schedules."})]}),e.jsxs("button",{className:"hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-slate-300 text-sm font-medium text-slate-700 hover:bg-slate-50",children:["View All ",e.jsx(u,{size:14})]})]}),e.jsx("div",{className:"grid sm:grid-cols-2 lg:grid-cols-3 gap-6",children:Y.map(t=>e.jsxs("div",{className:"border border-slate-200 rounded-xl p-6 hover:shadow-md transition-shadow",children:[e.jsxs("div",{className:"flex items-center justify-between mb-4",children:[e.jsx("span",{className:`text-xs font-medium px-2.5 py-1 rounded-full ${t.tagColor}`,children:t.tag}),e.jsx("span",{className:"text-xs text-slate-400",children:t.date})]}),e.jsx("h3",{className:"font-semibold text-slate-900 mb-2",children:t.title}),e.jsx("p",{className:"text-sm text-slate-500 leading-relaxed mb-4",children:t.desc}),e.jsxs("a",{href:"#",className:"inline-flex items-center gap-1 text-sm font-medium text-slate-900",children:["Read More ",e.jsx(u,{size:14})]})]},t.title))})]})}),e.jsx(x,{children:e.jsx("section",{className:"max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16",children:e.jsxs("div",{className:"rounded-2xl bg-gradient-to-br from-amber-300 to-amber-400 px-8 py-14 text-center",children:[e.jsx("h2",{className:"text-2xl sm:text-3xl font-bold text-slate-900 max-w-xl mx-auto",children:"Ready to Manage Your Hostel Experience?"}),e.jsx("p",{className:"text-slate-800/80 mt-4 max-w-lg mx-auto",children:"Join over 1,500 students who are already using our digital portal for a better, more secure residential life."}),e.jsxs("div",{className:"flex flex-wrap items-center justify-center gap-3 mt-8",children:[e.jsx("button",{onClick:()=>a("/login"),className:"px-5 py-3 rounded-lg bg-slate-900 text-white text-sm font-medium hover:bg-slate-800",children:"Register Now"}),e.jsx("button",{onClick:()=>a("/login"),className:"px-5 py-3 rounded-lg bg-white/70 text-slate-900 text-sm font-medium hover:bg-white",children:"Login to Portal"})]})]})})}),e.jsx(T,{})]})}export{J as default};

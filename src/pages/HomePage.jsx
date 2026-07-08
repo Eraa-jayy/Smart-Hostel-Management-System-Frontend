@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Sparkles,
@@ -13,17 +13,39 @@ import {
   CheckCircle2,
   ShieldCheck,
   Bell,
+  Utensils,
+  CreditCard,
   ClipboardCheck,
+  UtensilsCrossed,
   Image as ImageIcon,
 } from "lucide-react";
 import Navbar from "../components/Navbar.jsx";
 import Footer from "../components/Footer.jsx";
+import Reveal from "../components/Reveal.jsx";
+import heroBg from "../assests/herobg.jpg";
+import hostel01 from "../assests/hostel01.jpg";
 
 const HOSTELS = [
-  { name: "Meddawaththa Boys", note: "Near Engineering Faculty", icon: Users },
-  { name: "Eliyakanda New Boys", note: "Newly Renovated Complex", icon: Users },
-  { name: "Eliyakanda Girls", note: "Secure & Comfortable", icon: UserRound },
-  { name: "Wellamadama Boys", note: "Close to Main Campus", icon: GraduationCap },
+  {
+    name: "Meddawaththa Boy's Hostel",
+    note: "Allocated for 1st year male students",
+    icon: Users,
+  },
+  {
+    name: "Eliyakanda New Boy's Hostel",
+    note: "For 2nd year, 3rd year and 4th year Male students",
+    icon: Users,
+  },
+  {
+    name: "Eliyakanda New Girl's Hostel",
+    note: "For 2nd year, 3rd year and 4th year Female students",
+    icon: Users,
+  },
+  {
+    name: "Wellamadama Girl's Hostel",
+    note: "Mainly for 1st year girls",
+    icon: Users,
+  },
 ];
 
 const SERVICES = [
@@ -33,36 +55,60 @@ const SERVICES = [
     icon: BedDouble,
   },
   {
-    title: "Online Applications",
-    desc: "Seamlessly apply for room renewal or new admissions digitally.",
+    title: "Online Payments",
+    desc: "Pay hostel fees and settle damage fines easily with a secure and convenient online payment system.",
     icon: LayoutGrid,
   },
   {
-    title: "Maintenance",
-    desc: "Track status of your repair requests with real-time notifications.",
-    icon: Wrench,
+    title: "Canteen Services",
+    desc: "View daily menus, available meals, and food details from the hostel canteen.",
+    icon: Utensils,
   },
   {
-    title: "Visitor Mgmt",
-    desc: "Easy pre-registration for parents and guests for better security.",
+    title: "Maintenance & Complaints",
+    desc: "Report maintenance issues, submit complaints, and track repairing activities for a better hostel experience.",
     icon: UserPlus,
   },
 ];
 
 const WHY_CHOOSE = [
-  { title: "Easy Selection", desc: "Browse by faculty proximity", icon: CheckCircle2 },
-  { title: "Digital Allocation", desc: "Fair and transparent process", icon: LayoutGrid },
-  { title: "Complaint Tracking", desc: "Real-time status updates", icon: ClipboardCheck },
-  { title: "Announcements", desc: "Push notifications for alerts", icon: Bell },
-  { title: "Visitor Logs", desc: "Integrated security portal", icon: ShieldCheck },
-  { title: "Online Leave", desc: "Apply for leave easily", icon: CheckCircle2 },
+  {
+    title: "Smart Room Management",
+    desc: "View room allocations and hostel details through an organized floor-wise management system.",
+    icon: LayoutGrid,
+  },
+  {
+    title: "Maintenance Support",
+    desc: "Submit maintenance requests online and track repair progress with real-time updates.",
+    icon: ClipboardCheck,
+  },
+  {
+    title: "Secure Online Payments",
+    desc: "Pay hostel fees, damage charges, and late payment fines securely in one place.",
+    icon: CreditCard,
+  },
+  {
+    title: "Daily Canteen Menu",
+    desc: "Stay updated with breakfast, lunch, and dinner menus published by hostel canteen staff.",
+    icon: Utensils,
+  },
+  {
+    title: "Smart Notifications",
+    desc: "Receive important reminders for payments, fines, announcements, and maintenance updates.",
+    icon: Bell,
+  },
+  {
+    title: "Efficient Hostel Management",
+    desc: "A centralized platform connecting students and hostel staff for transparent and efficient operations.",
+    icon: ShieldCheck,
+  },
 ];
 
 const STATS = [
-  { value: "1500+", label: "ACTIVE STUDENTS" },
-  { value: "4", label: "MAJOR HOSTELS" },
-  { value: "600+", label: "READY ROOMS" },
-  { value: "24/7", label: "STAFF SUPPORT" },
+  { value: 1500, suffix: "+", label: "ACTIVE STUDENTS" },
+  { value: 4, suffix: "", label: "MAJOR HOSTELS" },
+  { value: 600, suffix: "+", label: "READY ROOMS" },
+  { value: 24, suffix: "/7", label: "STAFF SUPPORT" },
 ];
 
 const ANNOUNCEMENTS = [
@@ -92,32 +138,90 @@ const ANNOUNCEMENTS = [
 export default function HomePage() {
   const navigate = useNavigate();
 
+  const statsRef = useRef(null);
+  const [startCount, setStartCount] = useState(false);
+
+  const [counts, setCounts] = useState(STATS.map(() => 0));
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setStartCount(true);
+          observer.disconnect();
+        }
+      },
+      {
+        threshold: 0.4,
+      },
+    );
+
+    if (statsRef.current) {
+      observer.observe(statsRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!startCount) return;
+
+    STATS.forEach((stat, index) => {
+      let current = 0;
+
+      const duration = 1800;
+      const increment = stat.value / (duration / 20);
+
+      const timer = setInterval(() => {
+        current += increment;
+
+        if (current >= stat.value) {
+          current = stat.value;
+          clearInterval(timer);
+        }
+
+        setCounts((prev) => {
+          const updated = [...prev];
+          updated[index] = Math.floor(current);
+
+          return updated;
+        });
+      }, 20);
+    });
+  }, [startCount]);
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar activeLink="Home" />
 
       {/* Hero */}
-      <section className="bg-slate-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 grid lg:grid-cols-2 gap-12 items-start">
+      <section className="relative min-h-[600px] flex items-center overflow-hidden">
+        {/* Background Image with Blur */}
+        <div className="absolute inset-0">
+          <img
+            src={heroBg}
+            alt=""
+            className="w-full h-full object-cover blur-[2px] scale-105"
+          />
+          <div className="absolute inset-0 bg-black/55" />
+        </div>
+
+        <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 grid lg:grid-cols-2 gap-12 items-start animate-fadeIn">
           <div>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-semibold mb-5">
-              <Sparkles size={13} /> ACADEMIC HOUSING PORTAL
-            </span>
-            <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 leading-tight tracking-tight">
-              Find Your University <br /> Hostel with Ease
+            <h1 className="text-4xl sm:text-5xl font-bold text-white leading-tight tracking-tight">
+              Everything You Need for Hostel Living
             </h1>
-            <p className="mt-5 text-slate-600 leading-relaxed max-w-md">
-              Select your hostel to access notices, room information,
-              applications, maintenance requests, visitor management, and
-              more. A centralized hub for all your residential needs.
+            <p className="mt-5 text-white/80 leading-relaxed max-w-md">
+              Manage your accommodation, payments, maintenance requests, and
+              daily hostel services from one convenient platform.
             </p>
             <div className="flex flex-wrap gap-3 mt-8">
-              <button className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 transition-colors">
+              <button className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-white text-slate-900 text-sm font-semibold hover:bg-white/90 transition-all hover:scale-105">
                 Explore Hostels <ArrowRight size={16} />
               </button>
               <button
                 onClick={() => navigate("/login")}
-                className="px-5 py-3 rounded-lg border border-slate-300 text-slate-700 text-sm font-medium hover:bg-white transition-colors"
+                className="px-5 py-3 rounded-lg border-2 border-white/40 text-white text-sm font-semibold hover:bg-white/10 transition-all hover:scale-105"
               >
                 Student Login
               </button>
@@ -126,25 +230,24 @@ export default function HomePage() {
 
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-slate-900">Select Your Hostel</h2>
-              <a href="#hostels" className="text-sm text-slate-500 hover:text-slate-800">
-                View All
-              </a>
+              <h2 className="font-semibold text-white/90">
+                Select Your Hostel
+              </h2>
             </div>
             <div className="grid grid-cols-2 gap-4">
               {HOSTELS.map((h) => (
                 <div
                   key={h.name}
-                  className="bg-white rounded-xl border border-slate-200 p-4 hover:shadow-md transition-shadow"
+                  className="bg-white/10 backdrop-blur-md rounded-xl border border-white/20 p-4 hover:bg-white/20 transition-all"
                 >
-                  <span className="flex items-center justify-center w-9 h-9 rounded-lg bg-indigo-50 text-indigo-600 mb-3">
+                  <span className="flex items-center justify-center w-9 h-9 rounded-lg bg-white/20 text-white mb-3">
                     <h.icon size={17} />
                   </span>
-                  <p className="font-medium text-slate-900 text-sm">{h.name}</p>
-                  <p className="text-xs text-slate-500 mt-0.5">{h.note}</p>
+                  <p className="font-medium text-white text-sm">{h.name}</p>
+                  <p className="text-xs text-white/70 mt-0.5">{h.note}</p>
                   <a
                     href="#"
-                    className="inline-flex items-center gap-1 text-xs font-medium text-slate-700 mt-3 hover:text-slate-900"
+                    className="inline-flex items-center gap-1 text-xs font-medium text-white/80 mt-3 hover:text-white"
                   >
                     Select <ArrowRight size={12} />
                   </a>
@@ -156,9 +259,12 @@ export default function HomePage() {
       </section>
 
       {/* Integrated Services */}
+      <Reveal>
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-12">
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">Integrated Services</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">
+            Integrated Services
+          </h2>
           <div className="w-14 h-1 bg-amber-500 mx-auto mt-3 rounded-full" />
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -176,21 +282,28 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+      </Reveal>
 
       {/* Why Choose */}
+      <Reveal>
       <section className="bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 grid lg:grid-cols-2 gap-12 items-center">
-          <div className="aspect-[4/3] rounded-2xl bg-gradient-to-br from-indigo-100 to-slate-200 flex items-center justify-center">
-            <ImageIcon size={40} className="text-indigo-300" />
+          <div className="aspect-[4/3] rounded-2xl overflow-hidden">
+            <img
+              src={hostel01}
+              alt="Hostel"
+              className="w-full h-full object-cover"
+            />
           </div>
           <div>
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">
-              Why Choose Our Hostel System?
+              Why Choose UniNest?
             </h2>
             <p className="text-slate-600 mb-8 leading-relaxed">
-              Our platform is designed to provide a hassle-free administrative
-              experience for both students and staff, ensuring safety,
-              efficiency, and transparency.
+              Designed to simplify hostel management for students and university
+              staff by providing a secure, transparent, and fully digital
+              platform for accommodation, communication, and daily hostel
+              services.
             </p>
             <div className="grid sm:grid-cols-2 gap-x-8 gap-y-6">
               {WHY_CHOOSE.map((item) => (
@@ -199,7 +312,9 @@ export default function HomePage() {
                     <item.icon size={16} />
                   </span>
                   <div>
-                    <p className="font-medium text-slate-900 text-sm">{item.title}</p>
+                    <p className="font-medium text-slate-900 text-sm">
+                      {item.title}
+                    </p>
                     <p className="text-xs text-slate-500 mt-0.5">{item.desc}</p>
                   </div>
                 </div>
@@ -208,24 +323,36 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      </Reveal>
 
       {/* Stats */}
-      <section className="bg-slate-900">
+      <Reveal>
+      <section ref={statsRef} className="bg-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
-          {STATS.map((stat) => (
+          {STATS.map((stat, index) => (
             <div key={stat.label}>
-              <p className="text-3xl sm:text-4xl font-bold text-amber-400">{stat.value}</p>
-              <p className="text-xs tracking-wide text-slate-400 mt-1">{stat.label}</p>
+              <p className="text-3xl sm:text-4xl font-bold text-amber-400">
+                {counts[index]}
+                {stat.suffix}
+              </p>
+
+              <p className="text-xs tracking-wide text-slate-400 mt-1">
+                {stat.label}
+              </p>
             </div>
           ))}
         </div>
       </section>
+      </Reveal>
 
       {/* Announcements */}
+      <Reveal>
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="flex items-end justify-between mb-10">
           <div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">Recent Announcements</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">
+              Recent Announcements
+            </h2>
             <p className="text-slate-500 text-sm mt-1">
               Stay updated with the latest news and schedules.
             </p>
@@ -241,22 +368,31 @@ export default function HomePage() {
               className="border border-slate-200 rounded-xl p-6 hover:shadow-md transition-shadow"
             >
               <div className="flex items-center justify-between mb-4">
-                <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${a.tagColor}`}>
+                <span
+                  className={`text-xs font-medium px-2.5 py-1 rounded-full ${a.tagColor}`}
+                >
                   {a.tag}
                 </span>
                 <span className="text-xs text-slate-400">{a.date}</span>
               </div>
               <h3 className="font-semibold text-slate-900 mb-2">{a.title}</h3>
-              <p className="text-sm text-slate-500 leading-relaxed mb-4">{a.desc}</p>
-              <a href="#" className="inline-flex items-center gap-1 text-sm font-medium text-slate-900">
+              <p className="text-sm text-slate-500 leading-relaxed mb-4">
+                {a.desc}
+              </p>
+              <a
+                href="#"
+                className="inline-flex items-center gap-1 text-sm font-medium text-slate-900"
+              >
                 Read More <ArrowRight size={14} />
               </a>
             </div>
           ))}
         </div>
       </section>
+      </Reveal>
 
       {/* CTA */}
+      <Reveal>
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <div className="rounded-2xl bg-gradient-to-br from-amber-300 to-amber-400 px-8 py-14 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 max-w-xl mx-auto">
@@ -282,6 +418,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      </Reveal>
 
       <Footer />
     </div>

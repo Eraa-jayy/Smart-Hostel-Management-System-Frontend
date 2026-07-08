@@ -41,7 +41,7 @@ export default function RuHostelLogin({ onLogin }) {
           <div className="w-10 h-10 rounded-xl bg-[#101c5c] flex items-center justify-center">
             <Building2 size={20} className="text-white" strokeWidth={2} />
           </div>
-          <span className="text-2xl font-bold text-[#101c5c]">RuHostel</span>
+          <span className="text-2xl font-bold text-[#101c5c]">UniNest</span>
         </div>
 
         {/* Heading */}
@@ -93,7 +93,7 @@ export default function RuHostelLogin({ onLogin }) {
         {/* Username */}
         <div className="mb-5">
           <label className="block text-sm text-slate-700 mb-2">
-            Username or Institutional Email
+            Username
           </label>
           <div className="flex items-center bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 focus-within:ring-2 focus-within:ring-[#101c5c]/30 focus-within:border-[#101c5c]">
             <AtSign size={18} className="text-slate-400 mr-3 shrink-0" />
@@ -165,9 +165,9 @@ export default function RuHostelLogin({ onLogin }) {
             className="inline-flex items-center gap-2 text-slate-700 text-sm mb-4 hover:text-slate-900"
           >
             <ArrowLeft size={16} />
-            Back to Role Selection
+            Back to Register
           </a>
-          <p className="text-xs tracking-wide text-slate-400 uppercase mb-1">Support</p>
+          {/* <p className="text-xs tracking-wide text-slate-400 uppercase mb-1">Support</p> */}
           <p className="text-sm text-slate-600">
             Need Help?{" "}
             <a href="#" className="text-[#101c5c] font-semibold hover:underline">
@@ -178,9 +178,9 @@ export default function RuHostelLogin({ onLogin }) {
       </div>
 
       {/* Bottom note */}
-      <p className="absolute bottom-6 text-center text-xs text-white/70 tracking-wide">
+      {/* <p className="absolute bottom-6 text-center text-xs text-white/70 tracking-wide">
         🛡 Secure Institutional Access Protocol • SSL Encrypted
-      </p>
+      </p> */}
     </div>
   );
 }

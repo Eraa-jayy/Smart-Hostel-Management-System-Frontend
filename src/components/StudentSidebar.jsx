@@ -40,18 +40,9 @@ export default function StudentSidebar() {
           className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-gray-100">
           Complaints
         </Link>
-
+              
         <Link
-          to="/student-complaints"
-          className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-gray-100"
-        >
-          Maintenance
-        </Link>
-                
-
-
-        <Link
-          to="/student-complaints"
+          to="/student-Canteen"
           className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-gray-100"
         >
           Canteen
@@ -59,14 +50,14 @@ export default function StudentSidebar() {
 
 
         <Link
-          to="/student-complaints"
+          to="/student-Payments"
           className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-gray-100"
         >
           Payments
         </Link>
 
         <Link
-          to="/student-complaints"
+          to="/student-Notifications"
           className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-gray-100"
         >
           Notification

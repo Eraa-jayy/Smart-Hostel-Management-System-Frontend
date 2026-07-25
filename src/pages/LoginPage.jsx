@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 
 const ROLES = [
@@ -70,35 +71,17 @@ setLoading(true);
 try{
 
 
-const response = await fetch(
-"http://localhost:8080/api/auth/login",
-{
+const response = await axios.post(
+  "http://localhost:8080/api/auth/login",
 
-method:"POST",
+  {
+    username,
+    password
+  }
 
-headers:{
-"Content-Type":"application/json"
-},
+);
 
-body:JSON.stringify({
-
-username,
-password
-
-})
-
-});
-
-
-if(!response.ok){
-
-throw new Error("Invalid username or password");
-
-}
-
-
-
-const data = await response.json();
+const data = response.data;
 
 
 console.log("LOGIN RESPONSE :",data);

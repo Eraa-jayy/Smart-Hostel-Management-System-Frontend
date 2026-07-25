@@ -1,60 +1,152 @@
 import React from "react";
-import DashboardCard from "../../components/studentAffairs/DashboardCard";
+import { useNavigate } from "react-router-dom";
+import HostelCard from "../../components/studentAffairs/HostelCard";
 
-export default function Dashboard() {
+const StudentAffairsDashboard = () => {
+
+  const navigate = useNavigate();
+
+  // Temporary data
+  // Later replace with API call
+
+  const hostels = [
+
+    {
+      id:1,
+      name:"Sarasavi Hostel",
+      floors:4,
+      rooms:112,
+      students:420,
+      occupancy:85
+    },
+
+
+    {
+      id:2,
+      name:"Wijewardene Hostel",
+      floors:3,
+      rooms:86,
+      students:310,
+      occupancy:90
+    },
+
+
+    {
+      id:3,
+      name:"Gajaba Hostel",
+      floors:5,
+      rooms:140,
+      students:500,
+      occupancy:95
+    },
+
+
+    {
+      id:4,
+      name:"Mihindu Hostel",
+      floors:4,
+      rooms:100,
+      students:350,
+      occupancy:70
+    }
+
+  ];
+
+
+
+  const handleViewHostel = (hostel)=>{
+
+    navigate(
+      `/student-affairs/hostel/${hostel.id}`,
+      {
+        state:hostel
+      }
+    )
+   
+  };
+
+
+
   return (
-    <div>
 
-      <h1 className="text-3xl font-bold mb-6">
-        Welcome Student Affairs Officer 👋
-      </h1>
+    <div className="
+      min-h-screen
+      bg-gray-50
+      p-8
+    ">
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
 
-        <DashboardCard
-          title="Total Students"
-          value="1250"
-          color="bg-blue-600"
-        />
+      {/* Header */}
 
-        <DashboardCard
-          title="Hostels"
-          value="5"
-          color="bg-green-600"
-        />
+      <div className="mb-8">
 
-        <DashboardCard
-          title="Allocated"
-          value="980"
-          color="bg-purple-600"
-        />
+        <h1 className="
+          text-3xl
+          font-bold
+          text-gray-800
+        ">
+          Student Affairs Dashboard
+        </h1>
 
-        <DashboardCard
-          title="Pending"
-          value="270"
-          color="bg-red-500"
-        />
+
+        <p className="text-gray-500 mt-2">
+          Manage university hostels and student allocations
+        </p>
+
 
       </div>
 
-      <div className="bg-white rounded-xl shadow p-6 mt-8">
 
-        <h2 className="text-xl font-bold mb-4">
-          Recent Activities
-        </h2>
 
-        <ul className="space-y-3">
 
-          <li>✔ Hostel list uploaded.</li>
+      {/* Hostel Cards */}
 
-          <li>✔ Student allocation completed.</li>
+      <h2 className="
+        text-xl
+        font-semibold
+        mb-5
+        text-gray-700
+      ">
+        University Hostels
+      </h2>
 
-          <li>✔ New notification published.</li>
 
-        </ul>
+
+      <div className="
+        grid
+        grid-cols-1
+        md:grid-cols-2
+        xl:grid-cols-3
+        gap-6
+      ">
+
+
+        {
+          hostels.map((hostel)=>(
+
+            <HostelCard
+
+              key={hostel.id}
+
+              hostel={hostel}
+
+              onView={handleViewHostel}
+
+            />
+
+          ))
+        }
+
 
       </div>
+
+
 
     </div>
+
   );
-}
+
+};
+
+
+export default StudentAffairsDashboard;

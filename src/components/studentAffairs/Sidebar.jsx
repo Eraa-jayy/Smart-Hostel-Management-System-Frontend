@@ -16,7 +16,7 @@ export default function Sidebar() {
     { name: "Dashboard", path: "/student-affairs/dashboard", icon: LayoutDashboard },
     { name: "Students", path: "/student-affairs/students", icon: Users },
     { name: "Upload Students", path: "/student-affairs/upload", icon: Upload },
-    { name: "Hostels", path: "/student-affairs/hostels", icon: Building2 },
+    { name: "Hostels Management", path: "/student-affairs/hostels", icon: Building2 },
     { name: "Allocations", path: "/student-affairs/allocations", icon: Bed },
     { name: "Reports", path: "/student-affairs/reports", icon: FileText },
     { name: "Notifications", path: "/student-affairs/notifications", icon: Bell },

@@ -1,6 +1,11 @@
 import React, { Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Loading from "./components/Loading.jsx";
+import Students from "./pages/studentAffairs/Students";
+import HostelDetails from "./pages/studentAffairs/HostelDetails";
+import FloorRooms from "./pages/studentAffairs/FloorRooms.jsx";
+import RoomCard from "./components/studentAffairs/RoomCard.jsx";
+import Hostel from "./pages/StudentAffairs/Hostels.jsx";
 
 // Loading delay (Demo purpose)
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -72,6 +77,10 @@ const StudentAffairsDashboard = lazy(() =>
   import("./pages/studentAffairs/Dashboard.jsx")
 );
 
+const RoomDetails = lazy(
+()=>import("./pages/studentAffairs/RoomDetails")
+);
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -133,16 +142,49 @@ export default function App() {
               STUDENT AFFAIRS ROUTES
           ====================================================== */}
 
-          <Route
-            path="/student-affairs"
+          <Route path="/student-affairs"
             element={<StudentAffairsLayout />}
           >
+            <Route
+            path="/student-affairs/hostel/:id"
+            element={<HostelDetails />}
+            />
+
+            <Route
+            path="/student-affairs/floor/:id"
+            element={<FloorRooms />}
+            />
+
+            <Route
+            path="/student-affairs/room/:id"
+            element={<RoomDetails/>}
+            />
+
 
             {/* Default Student Affairs Dashboard */}
+
+            <Route 
+            index
+            element={<StudentAffairsDashboard/>}
+            />
+
             <Route
-              index
+              path="/student-affairs/dashboard"
               element={<StudentAffairsDashboard />}
             />
+
+            <Route
+
+              path="/student-affairs/students"
+              element={<Students />}
+            />
+
+            <Route
+              path="/student-affairs/hostel"
+              element={<Hostel />}
+            />
+
+            
 
           </Route>
 

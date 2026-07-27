@@ -1,20 +1,16 @@
 import React from "react";
 
 export default function StudentDetails({ student, close }) {
-
   if (!student) return null;
 
   return (
     <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
-
       <div className="bg-white rounded-xl p-6 w-[500px]">
-
         <h2 className="text-2xl font-bold mb-5">
           Student Details
         </h2>
 
         <div className="space-y-2">
-
           <p><strong>Student ID:</strong> {student.studentId}</p>
           <p><strong>Name:</strong> {student.name}</p>
           <p><strong>Faculty:</strong> {student.faculty}</p>
@@ -24,7 +20,6 @@ export default function StudentDetails({ student, close }) {
           <p><strong>Hostel:</strong> {student.hostel}</p>
           <p><strong>Room:</strong> {student.room}</p>
           <p><strong>Status:</strong> {student.status}</p>
-
         </div>
 
         <button
@@ -33,9 +28,7 @@ export default function StudentDetails({ student, close }) {
         >
           Close
         </button>
-
       </div>
-
     </div>
   );
 }

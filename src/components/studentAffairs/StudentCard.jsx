@@ -1,7 +1,11 @@
 import React from "react";
 import { UserCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const StudentCard = ({ student }) => {
+
+  const navigate =useNavigate();
+
   return (
     <div className="bg-white rounded-2xl shadow-md border p-6 hover:shadow-xl transition">
       <div className="flex items-center gap-4 mb-5">
@@ -31,7 +35,9 @@ const StudentCard = ({ student }) => {
         </p>
       </div>
 
-      <button className="mt-5 w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700">
+      <button 
+        onClick={()=>navigate(`/student-affairs/student/${student.studentId}`)}
+        className="mt-5 w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700">
         View Profile
       </button>
     </div>

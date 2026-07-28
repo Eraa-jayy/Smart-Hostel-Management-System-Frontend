@@ -11,7 +11,7 @@ import {
   UserCircle2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../service/axios";
 
 const ROLES = [
   { label: "Student", value: "STUDENT" },
@@ -21,38 +21,33 @@ const ROLES = [
   { label: "Hostel Canteen Staff", value: "CANTEEN" },
 ];
 
-export default function RuHostelLogin() {
+export default function LoginPage() {
   const navigate = useNavigate();
-
   const [role, setRole] = useState(ROLES[0]);
   const [roleOpen, setRoleOpen] = useState(false);
-
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-
   const [showPassword, setShowPassword] = useState(false);
-
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleLogin = async () => {
     setError("");
     setLoading(true);
 
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/auth/login",
-        { username, password }
-      );
+      const response = await api.post("/auth/login", {
+        username,
+        password,
+      });
 
       const data = response.data;
-      console.log("LOGIN RESPONSE :", data);
+      console.log("LOGIN SUCCESS : ", data);
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("username", data.username);
       localStorage.setItem("role", data.role);
 
-      // ROLE BASED REDIRECT
       switch (data.role) {
         case "STUDENT":
           navigate("/student");
@@ -69,16 +64,26 @@ export default function RuHostelLogin() {
         default:
           navigate("/");
       }
-    } catch (err) {
-      console.log(err);
-      setError(err.message);
+    } catch (error) {
+      console.log("FULL FAILED : ", error);
+
+      console.log(
+        "STATUS :",
+        error.response?.status
+      );
+
+      console.log("DATA :",
+        error.response?.data
+      );
+
+      setError("Invalid username or password");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-[#1e2a78] via-[#2f3f9e] to-[#8f9be0] px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#1e2a78] via-[#2f3f9e] to-[#8f9be0] px-4">
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-[560px] px-10 py-10">
         <div className="flex justify-center mb-6">
           <div className="bg-amber-200 px-5 py-2 rounded-full flex gap-2">
@@ -100,6 +105,7 @@ export default function RuHostelLogin() {
         </p>
 
         <label className="text-sm">Login as</label>
+
         <div className="relative mb-5">
           <button
             className="w-full flex justify-between bg-slate-50 border rounded-xl px-4 py-3"
@@ -110,7 +116,7 @@ export default function RuHostelLogin() {
           </button>
 
           {roleOpen && (
-            <div className="absolute w-full bg-white border rounded-xl z-10">
+            <div className="absolute w-full bg-white border rounded-xl z-20">
               {ROLES.map((item) => (
                 <button
                   key={item.value}
@@ -170,7 +176,7 @@ export default function RuHostelLogin() {
 
         <div className="text-center text-sm">
           <ArrowLeft size={16} className="inline" />
-          {" "}Back to Register
+          Back to Register
         </div>
       </div>
     </div>

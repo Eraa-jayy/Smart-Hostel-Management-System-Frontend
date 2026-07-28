@@ -85,6 +85,15 @@ const BulkUploadStudents = lazy(()=>
   import("./pages/studentAffairs/BulkUploadStudents.jsx")
 );
 
+const Allocations = lazy(() =>
+  import("./pages/studentAffairs/Allocations.jsx")
+);
+ 
+const StudentProfile = lazy(()=>
+import("./pages/studentAffairs/StudentProfile.jsx")
+);
+
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -124,6 +133,8 @@ export default function App() {
             <Route path="room/:id" element={<RoomDetailsLazy />} />
             <Route path="building/:id" element={<BuildingDetails />} />
             <Route path="bulk-upload" element={<BulkUploadStudents />} />
+            <Route path="allocations" element={<Allocations />} />
+            <Route path ="student/:id" element={<StudentProfile/>}/>
             </Route>
         </Routes>
       </Suspense>

@@ -1,4 +1,5 @@
 import React from "react";
+import {useNavigate } from "react-router-dom";
 import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -25,6 +26,16 @@ const BOTTOM_ITEMS = [
 
 export default function StudentSidebar({ onLogout }) {
   const location = useLocation();
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    localStorage.removeItem("role");
+
+    navigate("/login");
+  }
 
   return (
     <aside className="w-[260px] min-h-screen bg-[#0a0f1e] flex flex-col">
@@ -110,13 +121,13 @@ export default function StudentSidebar({ onLogout }) {
         {/* Logout */}
         <button
           type="button"
-          onClick={onLogout}
+          onClick={handleLogout}
           className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-[13px] font-medium text-red-400/80 hover:bg-red-500/10 hover:text-red-400 transition-all duration-200"
         >
           <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-red-500/10 text-red-400/60 group-hover:bg-red-500/15">
             <LogOut size={17} strokeWidth={2} />
           </div>
-          Sign Out
+          LOGOUT
         </button>
       </div>
 

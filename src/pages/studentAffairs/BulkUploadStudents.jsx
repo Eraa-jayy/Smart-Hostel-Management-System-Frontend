@@ -2,9 +2,22 @@ import React, { useEffect, useState } from "react";
 import { getAllHostels } from "../../service/hostelService";
 import { getAllBuildings, getBuildingById } from "../../service/buildingService";
 import { bulkUploadStudents } from "../../service/studentAllocationService";
-import { Upload, CheckCircle, XCircle } from "lucide-react";
+import { Upload, CheckCircle, XCircle, GraduationCap, BookOpen, ArrowLeft } from "lucide-react";
+
+const FACULTIES = [
+  "Faculty 01", "Faculty 02", "Faculty 03",
+  "Faculty 04", "Faculty 05", "Faculty 06",
+  "Faculty 07", "Faculty 08", "Faculty 09",
+];
+
+const YEARS = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
 
 export default function BulkUploadStudents() {
+  const [step, setStep] = useState(1);   // 1: faculty, 2: year, 3: upload form
+
+  const [selectedFaculty, setSelectedFaculty] = useState("");
+  const [selectedYear, setSelectedYear] = useState("");
+
   const [hostels, setHostels] = useState([]);
   const [buildings, setBuildings] = useState([]);
   const [floors, setFloors] = useState([]);
@@ -12,13 +25,12 @@ export default function BulkUploadStudents() {
   const [selectedHostel, setSelectedHostel] = useState("");
   const [selectedBuilding, setSelectedBuilding] = useState("");
   const [selectedFloor, setSelectedFloor] = useState("");
-  const [academicYear, setAcademicYear] = useState("");
+  const [expectedReleaseDate, setExpectedReleaseDate] = useState("");
   const [file, setFile] = useState(null);
 
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
 
-  // Load hostels on page load
   useEffect(() => {
     loadHostels();
   }, []);
@@ -32,7 +44,29 @@ export default function BulkUploadStudents() {
     }
   };
 
-  // Hostel select karama, e hostel ekeම buildings load karanawa
+  // ===== STEP 1: Faculty select =====
+  const handleFacultySelect = (faculty) => {
+    setSelectedFaculty(faculty);
+    setStep(2);
+  };
+
+  // ===== STEP 2: Year select =====
+  const handleYearSelect = (year) => {
+    setSelectedYear(year);
+    setStep(3);
+  };
+
+  const goBack = () => {
+    if (step === 2) {
+      setStep(1);
+      setSelectedFaculty("");
+    } else if (step === 3) {
+      setStep(2);
+      setSelectedYear("");
+    }
+  };
+
+  // ===== STEP 3: Hostel/Building/Floor + Upload =====
   const handleHostelChange = async (e) => {
     const hostelId = e.target.value;
     setSelectedHostel(hostelId);
@@ -56,7 +90,6 @@ export default function BulkUploadStudents() {
     }
   };
 
-  // Building select karama, e building ekeම floors load karanawa (details endpoint eken)
   const handleBuildingChange = async (e) => {
     const buildingId = e.target.value;
     setSelectedBuilding(buildingId);
@@ -86,8 +119,8 @@ export default function BulkUploadStudents() {
       alert("Please select a floor");
       return;
     }
-    if (!academicYear) {
-      alert("Please enter academic year");
+    if (!expectedReleaseDate) {
+      alert("Please select expected release date");
       return;
     }
     if (!file) {
@@ -95,11 +128,19 @@ export default function BulkUploadStudents() {
       return;
     }
 
+    // academicYear eka Faculty + Year ekin auto-generate wenawa
+    const academicYear = `${selectedFaculty} - ${selectedYear}`;
+
     setLoading(true);
     setResult(null);
 
     try {
-      const response = await bulkUploadStudents(file, selectedFloor, academicYear);
+      const response = await bulkUploadStudents(
+        file,
+        selectedFloor,
+        academicYear,
+        expectedReleaseDate
+      );
       setResult(response.data);
     } catch (error) {
       console.log(error);
@@ -109,103 +150,212 @@ export default function BulkUploadStudents() {
     }
   };
 
+  const resetAll = () => {
+    setStep(1);
+    setSelectedFaculty("");
+    setSelectedYear("");
+    setSelectedHostel("");
+    setSelectedBuilding("");
+    setSelectedFloor("");
+    setExpectedReleaseDate("");
+    setFile(null);
+    setResult(null);
+  };
+
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
-      <h1 className="text-3xl font-bold mb-8">Bulk Upload Students</h1>
+      <h1 className="text-3xl font-bold mb-2">Bulk Upload Students</h1>
 
-      <div className="bg-white p-6 rounded-xl shadow max-w-2xl">
-        <form onSubmit={handleSubmit}>
-          {/* Hostel Select */}
-          <label className="block text-sm font-semibold text-gray-600 mb-1">
-            Hostel
-          </label>
-          <select
-            value={selectedHostel}
-            onChange={handleHostelChange}
-            className="border p-3 rounded w-full mb-4"
-          >
-            <option value="">Select Hostel</option>
-            {hostels.map((h) => (
-              <option key={h.id} value={h.id}>
-                {h.hostelName}
-              </option>
-            ))}
-          </select>
-
-          {/* Building Select */}
-          <label className="block text-sm font-semibold text-gray-600 mb-1">
-            Building
-          </label>
-          <select
-            value={selectedBuilding}
-            onChange={handleBuildingChange}
-            disabled={!selectedHostel}
-            className="border p-3 rounded w-full mb-4 disabled:bg-gray-100"
-          >
-            <option value="">Select Building</option>
-            {buildings.map((b) => (
-              <option key={b.id} value={b.id}>
-                {b.buildingName}
-              </option>
-            ))}
-          </select>
-
-          {/* Floor Select */}
-          <label className="block text-sm font-semibold text-gray-600 mb-1">
-            Floor
-          </label>
-          <select
-            value={selectedFloor}
-            onChange={(e) => setSelectedFloor(e.target.value)}
-            disabled={!selectedBuilding}
-            className="border p-3 rounded w-full mb-4 disabled:bg-gray-100"
-          >
-            <option value="">Select Floor</option>
-            {floors.map((f) => (
-              <option key={f.id} value={f.id}>
-                {f.floorName} (Floor {f.floorNumber})
-              </option>
-            ))}
-          </select>
-
-          {/* Academic Year */}
-          <label className="block text-sm font-semibold text-gray-600 mb-1">
-            Academic Year
-          </label>
-          <input
-            type="text"
-            placeholder="e.g. 2025/2026"
-            value={academicYear}
-            onChange={(e) => setAcademicYear(e.target.value)}
-            className="border p-3 rounded w-full mb-4"
-          />
-
-          {/* Excel File */}
-          <label className="block text-sm font-semibold text-gray-600 mb-1">
-            Excel File
-          </label>
-          <input
-            type="file"
-            accept=".xlsx,.xls"
-            onChange={handleFileChange}
-            className="border p-3 rounded w-full mb-6"
-          />
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2 disabled:bg-gray-400"
-          >
-            <Upload size={18} />
-            {loading ? "Uploading..." : "Upload & Allocate"}
-          </button>
-        </form>
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-2 text-sm text-gray-500 mb-8">
+        <span className={step >= 1 ? "text-blue-600 font-semibold" : ""}>
+          1. Faculty
+        </span>
+        <span>→</span>
+        <span className={step >= 2 ? "text-blue-600 font-semibold" : ""}>
+          2. Year
+        </span>
+        <span>→</span>
+        <span className={step >= 3 ? "text-blue-600 font-semibold" : ""}>
+          3. Upload
+        </span>
       </div>
 
-      {/* RESULT SECTION */}
+      {/* ===== STEP 1: Faculty Cards ===== */}
+      {step === 1 && (
+        <div>
+          <h2 className="text-xl font-semibold mb-5">Select Faculty</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
+            {FACULTIES.map((faculty) => (
+              <button
+                key={faculty}
+                onClick={() => handleFacultySelect(faculty)}
+                className="bg-white p-6 rounded-xl shadow hover:shadow-lg hover:border-blue-500 border-2 border-transparent transition flex flex-col items-center gap-3"
+              >
+                <div className="bg-blue-100 p-4 rounded-full">
+                  <GraduationCap className="text-blue-600" size={28} />
+                </div>
+                <span className="font-semibold text-gray-700">{faculty}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ===== STEP 2: Year Cards ===== */}
+      {step === 2 && (
+        <div>
+          <button
+            onClick={goBack}
+            className="flex items-center gap-1 text-blue-600 font-semibold mb-5"
+          >
+            <ArrowLeft size={16} /> Back to Faculty
+          </button>
+
+          <h2 className="text-xl font-semibold mb-1">
+            {selectedFaculty}
+          </h2>
+          <p className="text-gray-500 mb-5">Select Academic Year</p>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+            {YEARS.map((year) => (
+              <button
+                key={year}
+                onClick={() => handleYearSelect(year)}
+                className="bg-white p-6 rounded-xl shadow hover:shadow-lg hover:border-indigo-500 border-2 border-transparent transition flex flex-col items-center gap-3"
+              >
+                <div className="bg-indigo-100 p-4 rounded-full">
+                  <BookOpen className="text-indigo-600" size={28} />
+                </div>
+                <span className="font-semibold text-gray-700">{year}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ===== STEP 3: Upload Form ===== */}
+      {step === 3 && (
+        <div>
+          <button
+            onClick={goBack}
+            className="flex items-center gap-1 text-blue-600 font-semibold mb-5"
+          >
+            <ArrowLeft size={16} /> Back to Year
+          </button>
+
+          <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg mb-5">
+            <p className="text-sm text-blue-700">
+              <strong>{selectedFaculty}</strong> · <strong>{selectedYear}</strong>
+            </p>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl shadow max-w-2xl">
+            <form onSubmit={handleSubmit}>
+              {/* Hostel Select */}
+              <label className="block text-sm font-semibold text-gray-600 mb-1">
+                Hostel
+              </label>
+              <select
+                value={selectedHostel}
+                onChange={handleHostelChange}
+                className="border p-3 rounded w-full mb-4"
+              >
+                <option value="">Select Hostel</option>
+                {hostels.map((h) => (
+                  <option key={h.id} value={h.id}>
+                    {h.hostelName}
+                  </option>
+                ))}
+              </select>
+
+              {/* Building Select */}
+              <label className="block text-sm font-semibold text-gray-600 mb-1">
+                Building
+              </label>
+              <select
+                value={selectedBuilding}
+                onChange={handleBuildingChange}
+                disabled={!selectedHostel}
+                className="border p-3 rounded w-full mb-4 disabled:bg-gray-100"
+              >
+                <option value="">Select Building</option>
+                {buildings.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.buildingName}
+                  </option>
+                ))}
+              </select>
+
+              {/* Floor Select */}
+              <label className="block text-sm font-semibold text-gray-600 mb-1">
+                Floor
+              </label>
+              <select
+                value={selectedFloor}
+                onChange={(e) => setSelectedFloor(e.target.value)}
+                disabled={!selectedBuilding}
+                className="border p-3 rounded w-full mb-4 disabled:bg-gray-100"
+              >
+                <option value="">Select Floor</option>
+                {floors.map((f) => (
+                  <option key={f.id} value={f.id}>
+                    {f.floorName} (Floor {f.floorNumber})
+                  </option>
+                ))}
+              </select>
+
+              {/* Expected Release Date */}
+              <label className="block text-sm font-semibold text-gray-600 mb-1">
+                Expected Release Date
+              </label>
+              <input
+                type="date"
+                value={expectedReleaseDate}
+                onChange={(e) => setExpectedReleaseDate(e.target.value)}
+                min={new Date().toISOString().split("T")[0]}
+                className="border p-3 rounded w-full mb-1"
+              />
+              <p className="text-xs text-gray-400 mb-4">
+                Students will be automatically released from their rooms on this date
+              </p>
+
+              {/* Excel File */}
+              <label className="block text-sm font-semibold text-gray-600 mb-1">
+                Excel File
+              </label>
+              <input
+                type="file"
+                accept=".xlsx,.xls"
+                onChange={handleFileChange}
+                className="border p-3 rounded w-full mb-6"
+              />
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2 disabled:bg-gray-400"
+              >
+                <Upload size={18} />
+                {loading ? "Uploading..." : "Upload & Allocate"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ===== RESULT SECTION ===== */}
       {result && (
         <div className="bg-white p-6 rounded-xl shadow max-w-4xl mt-8">
-          <h2 className="text-xl font-bold mb-4">Upload Result</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold">Upload Result</h2>
+            <button
+              onClick={resetAll}
+              className="text-blue-600 font-semibold text-sm"
+            >
+              Upload Another Batch
+            </button>
+          </div>
 
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="bg-green-50 p-4 rounded-lg flex items-center gap-3">
@@ -229,7 +379,6 @@ export default function BulkUploadStudents() {
             </div>
           </div>
 
-          {/* Failed Reasons */}
           {result.failedReasons?.length > 0 && (
             <div className="mb-6">
               <h3 className="font-semibold text-red-700 mb-2">Failed Records</h3>
@@ -241,7 +390,6 @@ export default function BulkUploadStudents() {
             </div>
           )}
 
-          {/* Created Accounts Table */}
           {result.createdAccounts?.length > 0 && (
             <div>
               <h3 className="font-semibold text-gray-800 mb-2">

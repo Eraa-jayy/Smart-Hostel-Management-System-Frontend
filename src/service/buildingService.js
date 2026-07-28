@@ -1,3 +1,4 @@
+import axios from "axios";
 import api from "./axios";
 
 // CREATE BUILDING
@@ -24,3 +25,9 @@ export const updateBuilding = (id, buildingData) => {
 export const deleteBuilding = (id) => {
   return api.delete(`/buildings/${id}`);
 };
+
+export const getBuildingsByHostl = (hostelId) => {
+    return axios.get(
+        '/buildings/hostel/${hostelID}'
+    );
+} ;

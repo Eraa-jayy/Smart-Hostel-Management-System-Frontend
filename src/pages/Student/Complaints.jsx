@@ -1,185 +1,320 @@
-import React from "react";
+import React, { useState } from "react";
+import {
+  FileWarning,
+  Send,
+  RotateCcw,
+  Clock,
+  AlertCircle,
+  CheckCircle2,
+  XCircle,
+  Search,
+  Filter,
+  MessageSquareWarning,
+  ChevronDown,
+  CalendarDays,
+  Tag,
+} from "lucide-react";
+
+const CATEGORIES = [
+  "Electrical",
+  "Plumbing",
+  "Furniture",
+  "Internet / Wi-Fi",
+  "Cleanliness",
+  "Security",
+  "Other",
+];
+
+const PRIORITIES = [
+  { value: "low", label: "Low", color: "bg-emerald-50 text-emerald-600 border-emerald-200 ring-emerald-100" },
+  { value: "medium", label: "Medium", color: "bg-amber-50 text-amber-600 border-amber-200 ring-amber-100" },
+  { value: "high", label: "High", color: "bg-red-50 text-red-600 border-red-200 ring-red-100" },
+];
+
+const COMPLAINTS = [
+  {
+    id: "#1042",
+    title: "Broken Chair",
+    category: "Furniture",
+    priority: "low",
+    status: "pending",
+    date: "Jul 12, 2026",
+    description: "The chair near the study desk has a broken leg and wobbles.",
+  },
+  {
+    id: "#1038",
+    title: "Water Leakage from Ceiling",
+    category: "Plumbing",
+    priority: "high",
+    status: "in_progress",
+    date: "Jul 10, 2026",
+    description: "Water is leaking from the ceiling near the window during rain.",
+  },
+  {
+    id: "#1035",
+    title: "Fan Not Working",
+    category: "Electrical",
+    priority: "medium",
+    status: "completed",
+    date: "Jul 8, 2026",
+    description: "The ceiling fan makes a loud noise and stops intermittently.",
+  },
+  {
+    id: "#1030",
+    title: "Wi-Fi Dropping Frequently",
+    category: "Internet / Wi-Fi",
+    priority: "medium",
+    status: "in_progress",
+    date: "Jul 5, 2026",
+    description: "Wi-Fi disconnects every 15-20 minutes in room A-204.",
+  },
+];
+
+const STATUS_CONFIG = {
+  pending: { label: "Pending", icon: Clock, color: "bg-amber-50 text-amber-600", dot: "bg-amber-400" },
+  in_progress: { label: "In Progress", icon: AlertCircle, color: "bg-blue-50 text-blue-600", dot: "bg-blue-400" },
+  completed: { label: "Resolved", icon: CheckCircle2, color: "bg-emerald-50 text-emerald-600", dot: "bg-emerald-400" },
+  rejected: { label: "Rejected", icon: XCircle, color: "bg-red-50 text-red-600", dot: "bg-red-400" },
+};
+
+const PRIORITY_CONFIG = {
+  low: "bg-emerald-50 text-emerald-600",
+  medium: "bg-amber-50 text-amber-600",
+  high: "bg-red-50 text-red-600",
+};
 
 export default function Complaints() {
+  const [title, setTitle] = useState("");
+  const [category, setCategory] = useState("");
+  const [priority, setPriority] = useState("");
+  const [description, setDescription] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+
+  const filtered = filterStatus === "all"
+    ? COMPLAINTS
+    : COMPLAINTS.filter((c) => c.status === filterStatus);
+
+  const stats = {
+    total: COMPLAINTS.length,
+    pending: COMPLAINTS.filter((c) => c.status === "pending").length,
+    inProgress: COMPLAINTS.filter((c) => c.status === "in_progress").length,
+    resolved: COMPLAINTS.filter((c) => c.status === "completed").length,
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-
-      {/* Page Title */}
-      <h1 className="text-3xl font-bold text-gray-800">
-        Complaints
-      </h1>
-
-      <p className="text-gray-500 mt-2">
-        Submit and track your hostel complaints.
-      </p>
-
-      {/* Complaint Form */}
-      <div className="bg-white rounded-xl shadow mt-8 p-8">
-
-        <h2 className="text-2xl font-semibold mb-6">
-          Submit New Complaint
-        </h2>
-
-        {/* Complaint Title */}
-        <div className="mb-5">
-          <label className="block mb-2 font-medium text-gray-700">
-            Complaint Title
-          </label>
-
-          <input
-            type="text"
-            placeholder="Enter complaint title"
-            className="w-full border rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
-          />
+    <div className="space-y-6">
+      {/* ── Page Header ── */}
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Complaints</h1>
+          <p className="text-sm text-gray-400 mt-0.5">
+            Submit and track your maintenance requests
+          </p>
         </div>
+      </div>
 
-        {/* Category */}
-        <div className="mb-5">
-          <label className="block mb-2 font-medium text-gray-700">
-            Category
-          </label>
+      {/* ── Stats Row ── */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {[
+          { label: "Total", value: stats.total, color: "from-gray-500 to-gray-600", bg: "bg-gray-50", iconColor: "text-gray-600", icon: FileWarning },
+          { label: "Pending", value: stats.pending, color: "from-amber-500 to-orange-500", bg: "bg-amber-50", iconColor: "text-amber-600", icon: Clock },
+          { label: "In Progress", value: stats.inProgress, color: "from-blue-500 to-blue-600", bg: "bg-blue-50", iconColor: "text-blue-600", icon: AlertCircle },
+          { label: "Resolved", value: stats.resolved, color: "from-emerald-500 to-emerald-600", bg: "bg-emerald-50", iconColor: "text-emerald-600", icon: CheckCircle2 },
+        ].map(({ label, value, bg, iconColor, icon: Icon }) => (
+          <div key={label} className="bg-white rounded-2xl border border-gray-100 p-4 hover:shadow-md transition-all duration-200">
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center`}>
+                <Icon size={18} className={iconColor} strokeWidth={2} />
+              </div>
+              <div>
+                <p className="text-xl font-bold text-gray-900">{value}</p>
+                <p className="text-[11px] text-gray-400">{label}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
 
-          <select className="w-full border rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none">
-            <option>Select Category</option>
-            <option>Electrical</option>
-            <option>Plumbing</option>
-            <option>Furniture</option>
-            <option>Internet / Wi-Fi</option>
-            <option>Cleanliness</option>
-            <option>Security</option>
-            <option>Other</option>
-          </select>
-        </div>
+      {/* ── Two Column Layout ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        {/* ── Submit Form (Left) ── */}
+        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-6 h-fit">
+          <div className="flex items-center gap-2.5 mb-5">
+            <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
+              <Send size={16} className="text-blue-600" />
+            </div>
+            <h2 className="text-sm font-semibold text-gray-800">New Complaint</h2>
+          </div>
 
-        {/* Priority */}
-        <div className="mb-5">
-          <label className="block mb-3 font-medium text-gray-700">
-            Priority
-          </label>
+          <div className="space-y-4">
+            {/* Title */}
+            <div>
+              <label className="block text-[12px] font-medium text-gray-500 mb-1.5">Title</label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="e.g. Broken ceiling fan"
+                className="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-gray-300"
+              />
+            </div>
 
-          <div className="flex gap-6">
+            {/* Category */}
+            <div>
+              <label className="block text-[12px] font-medium text-gray-500 mb-1.5">Category</label>
+              <div className="relative">
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all appearance-none"
+                >
+                  <option value="">Select category</option>
+                  {CATEGORIES.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              </div>
+            </div>
 
-            <label className="flex items-center gap-2">
-              <input type="radio" name="priority" />
-              Low
-            </label>
+            {/* Priority */}
+            <div>
+              <label className="block text-[12px] font-medium text-gray-500 mb-2">Priority</label>
+              <div className="flex gap-2.5">
+                {PRIORITIES.map(({ value, label, color }) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setPriority(value)}
+                    className={`flex-1 py-2 text-xs font-semibold rounded-xl border-2 transition-all duration-200 ${
+                      priority === value
+                        ? color + " ring-2"
+                        : "bg-gray-50 text-gray-400 border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-            <label className="flex items-center gap-2">
-              <input type="radio" name="priority" />
-              Medium
-            </label>
+            {/* Description */}
+            <div>
+              <label className="block text-[12px] font-medium text-gray-500 mb-1.5">Description</label>
+              <textarea
+                rows="4"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Describe the issue in detail..."
+                className="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all resize-none placeholder:text-gray-300"
+              />
+            </div>
 
-            <label className="flex items-center gap-2">
-              <input type="radio" name="priority" />
-              High
-            </label>
-
+            {/* Actions */}
+            <div className="flex gap-3 pt-1">
+              <button
+                type="button"
+                onClick={() => { setTitle(""); setCategory(""); setPriority(""); setDescription(""); }}
+                className="flex items-center justify-center gap-2 flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
+              >
+                <RotateCcw size={14} />
+                Clear
+              </button>
+              <button
+                type="button"
+                className="flex items-center justify-center gap-2 flex-1 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 shadow-sm shadow-blue-500/25 transition-all"
+              >
+                <Send size={14} />
+                Submit
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Description */}
-        <div className="mb-6">
-          <label className="block mb-2 font-medium text-gray-700">
-            Description
-          </label>
+        {/* ── Complaints List (Right) ── */}
+        <div className="lg:col-span-3 space-y-4">
+          {/* Filter bar */}
+          <div className="bg-white rounded-2xl border border-gray-100 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <Filter size={15} />
+              <span className="text-[12px] font-medium">Filter:</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { value: "all", label: "All" },
+                { value: "pending", label: "Pending" },
+                { value: "in_progress", label: "In Progress" },
+                { value: "completed", label: "Resolved" },
+              ].map(({ value, label }) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setFilterStatus(value)}
+                  className={`px-3 py-1.5 text-[12px] font-medium rounded-lg transition-all duration-200 ${
+                    filterStatus === value
+                      ? "bg-gray-900 text-white shadow-sm"
+                      : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
 
-          <textarea
-            rows="5"
-            placeholder="Describe your complaint..."
-            className="w-full border rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
-          ></textarea>
+          {/* Complaint cards */}
+          {filtered.map((complaint) => {
+            const st = STATUS_CONFIG[complaint.status];
+            const StatusIcon = st.icon;
+            return (
+              <div
+                key={complaint.id}
+                className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-md hover:border-gray-200 transition-all duration-200"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3 min-w-0">
+                    <div className={`mt-0.5 w-2 h-2 rounded-full ${st.dot} flex-shrink-0`} />
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="text-[14px] font-semibold text-gray-800">{complaint.title}</h3>
+                        <span className="text-[10px] font-mono text-gray-300">{complaint.id}</span>
+                      </div>
+                      <p className="text-[12px] text-gray-400 mt-1 leading-relaxed">{complaint.description}</p>
+                    </div>
+                  </div>
+                  <span className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full flex-shrink-0 ${st.color}`}>
+                    <StatusIcon size={11} />
+                    {st.label}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-3 mt-4 pt-3 border-t border-gray-50">
+                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${PRIORITY_CONFIG[complaint.priority]}`}>
+                    {complaint.priority.charAt(0).toUpperCase() + complaint.priority.slice(1)}
+                  </span>
+                  <span className="flex items-center gap-1 text-[11px] text-gray-400">
+                    <Tag size={10} />
+                    {complaint.category}
+                  </span>
+                  <span className="flex items-center gap-1 text-[11px] text-gray-400">
+                    <CalendarDays size={10} />
+                    {complaint.date}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+
+          {filtered.length === 0 && (
+            <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
+              <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-3">
+                <MessageSquareWarning size={20} className="text-gray-300" />
+              </div>
+              <p className="text-sm text-gray-400">No complaints found</p>
+            </div>
+          )}
         </div>
-
-        {/* Buttons */}
-        <div className="flex justify-end gap-4">
-
-          <button
-            className="px-6 py-3 rounded-lg bg-gray-300 hover:bg-gray-400"
-          >
-            Clear
-          </button>
-
-          <button
-            className="px-6 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
-          >
-            Submit Complaint
-          </button>
-
-        </div>
-
       </div>
-
-      {/* Complaint History */}
-      <div className="bg-white rounded-xl shadow mt-10 p-8">
-
-        <h2 className="text-2xl font-semibold mb-6">
-          My Complaints
-        </h2>
-
-        <div className="overflow-x-auto">
-
-          <table className="w-full border-collapse">
-
-            <thead>
-
-              <tr className="bg-gray-100">
-
-                <th className="text-left p-3">Title</th>
-                <th className="text-left p-3">Category</th>
-                <th className="text-left p-3">Priority</th>
-                <th className="text-left p-3">Status</th>
-                <th className="text-left p-3">Date</th>
-
-              </tr>
-
-            </thead>
-
-            <tbody>
-
-              <tr className="border-b">
-                <td className="p-3">Broken Chair</td>
-                <td className="p-3">Furniture</td>
-                <td className="p-3">Low</td>
-                <td className="p-3">
-                  <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm">
-                    Pending
-                  </span>
-                </td>
-                <td className="p-3">12 Jul 2026</td>
-              </tr>
-
-              <tr className="border-b">
-                <td className="p-3">Water Leakage</td>
-                <td className="p-3">Plumbing</td>
-                <td className="p-3">High</td>
-                <td className="p-3">
-                  <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">
-                    In Progress
-                  </span>
-                </td>
-                <td className="p-3">10 Jul 2026</td>
-              </tr>
-
-              <tr>
-                <td className="p-3">Fan Not Working</td>
-                <td className="p-3">Electrical</td>
-                <td className="p-3">Medium</td>
-                <td className="p-3">
-                  <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
-                    Completed
-                  </span>
-                </td>
-                <td className="p-3">08 Jul 2026</td>
-              </tr>
-
-            </tbody>
-
-          </table>
-
-        </div>
-
-      </div>
-
     </div>
   );
 }

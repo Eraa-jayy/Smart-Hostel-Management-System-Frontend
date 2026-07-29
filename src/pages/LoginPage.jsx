@@ -47,6 +47,7 @@ export default function LoginPage() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("username", data.username);
       localStorage.setItem("role", data.role);
+      localStorage.setItem("fullName", data.fullName);
 
       if(data.forcePasswordChange){
         navigate("/change-password");

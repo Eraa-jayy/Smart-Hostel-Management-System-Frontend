@@ -7,3 +7,8 @@ export const getStudentById = (id) =>{
 export const getAllStudents = () =>{
     return api.get("/students");
 }
+
+export const getMyRoom = async () => {
+    const response = await axios.get("/auth/allocations/my-room");
+    return response.data;
+}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Building2,
@@ -8,12 +8,10 @@ import {
   CreditCard,
   TrendingUp,
   TrendingDown,
-  ArrowUpRight,
   Clock,
   AlertCircle,
   CheckCircle2,
   CalendarDays,
-  IndianRupee,
   FileWarning,
   ChevronRight,
   UtensilsCrossed,
@@ -21,54 +19,7 @@ import {
   Zap,
   Droplets,
 } from "lucide-react";
-
-/* ── Stat Cards ── */
-const STATS = [
-  {
-    label: "Hostel",
-    value: "Block A",
-    sub: "Royal University",
-    icon: Building2,
-    color: "from-blue-500 to-blue-600",
-    bg: "bg-blue-50",
-    iconColor: "text-blue-600",
-    change: "+2%",
-    up: true,
-  },
-  {
-    label: "Room No.",
-    value: "A-204",
-    sub: "Triple Sharing",
-    icon: DoorOpen,
-    color: "from-emerald-500 to-emerald-600",
-    bg: "bg-emerald-50",
-    iconColor: "text-emerald-600",
-    change: "Assigned",
-    up: true,
-  },
-  {
-    label: "Pending Requests",
-    value: "2",
-    sub: "1 urgent",
-    icon: Wrench,
-    color: "from-amber-500 to-orange-500",
-    bg: "bg-amber-50",
-    iconColor: "text-amber-600",
-    change: "-12%",
-    up: false,
-  },
-  {
-    label: "Unread Notices",
-    value: "5",
-    sub: "2 new today",
-    icon: Megaphone,
-    color: "from-violet-500 to-purple-600",
-    bg: "bg-violet-50",
-    iconColor: "text-violet-600",
-    change: "+3",
-    up: true,
-  },
-];
+import { getMyRoomDetails } from "../../service/studentAllocationService";
 
 /* ── Quick Actions ── */
 const ACTIONS = [
@@ -78,30 +29,26 @@ const ACTIONS = [
   { label: "Announcements", icon: Megaphone, path: "/student/notifications", color: "bg-violet-50 text-violet-600" },
 ];
 
-/* ── Recent Activity ── */
+/* ── Recent Activity (static - not implemented yet) ── */
 const ACTIVITY = [
   { text: "Payment of ₹8,500 received", time: "2 hours ago", type: "success" },
   { text: "Complaint #1042 resolved", time: "5 hours ago", type: "success" },
   { text: "New announcement: Mid-term exam schedule", time: "Yesterday", type: "info" },
-  { text: "Maintenance request pending review", time: "2 days ago", type: "warning" },
-  { text: "Room inspection scheduled for Friday", time: "3 days ago", type: "info" },
 ];
 
-/* ── Upcoming Payments ── */
+/* ── Upcoming Payments (static) ── */
 const PAYMENTS = [
   { name: "Hostel Fee - Jan 2026", amount: "₹8,500", due: "Jan 15, 2026", status: "paid" },
   { name: "Mess Fee - Jan 2026", amount: "₹3,200", due: "Jan 20, 2026", status: "pending" },
-  { name: "Hostel Fee - Feb 2026", amount: "₹8,500", due: "Feb 15, 2026", status: "upcoming" },
 ];
 
-/* ── Announcements ── */
+/* ── Announcements (static) ── */
 const ANNOUNCEMENTS = [
   { title: "Mid-term Exam Schedule Released", date: "Jan 12, 2026", tag: "Academic", color: "bg-blue-500" },
   { title: "Hostel Fee Deadline Extended", date: "Jan 10, 2026", tag: "Finance", color: "bg-amber-500" },
-  { title: "Annual Sports Day - Jan 25", date: "Jan 8, 2026", tag: "Events", color: "bg-emerald-500" },
 ];
 
-/* ── Facilities ── */
+/* ── Facilities (static) ── */
 const FACILITIES = [
   { label: "Wi-Fi", icon: Wifi, available: true },
   { label: "Power Backup", icon: Zap, available: true },
@@ -109,12 +56,89 @@ const FACILITIES = [
 ];
 
 export default function StudentDashboard() {
+  const [roomData, setRoomData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    loadMyRoomDetails();
+  }, []);
+
+  const loadMyRoomDetails = async () => {
+    try {
+      const response = await getMyRoomDetails();
+      setRoomData(response.data);
+    } catch (err) {
+      console.log(err);
+      setError("No active room allocation found");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Roommate initials (avatar walata)
+  const getInitials = (name) => {
+    if (!name) return "?";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  // Dynamic stats - real data eken
+  const STATS = [
+    {
+      label: "Hostel",
+      value: roomData?.hostelName || "—",
+      sub: roomData?.buildingName || "",
+      icon: Building2,
+      bg: "bg-blue-50",
+      iconColor: "text-blue-600",
+      change: roomData ? "Assigned" : "N/A",
+      up: true,
+    },
+    {
+      label: "Room No.",
+      value: roomData?.roomNumber || "—",
+      sub: roomData?.floorName || "",
+      icon: DoorOpen,
+      bg: "bg-emerald-50",
+      iconColor: "text-emerald-600",
+      change: roomData ? "Active" : "N/A",
+      up: true,
+    },
+    {
+      label: "Pending Requests",
+      value: "0",
+      sub: "No urgent",
+      icon: Wrench,
+      bg: "bg-amber-50",
+      iconColor: "text-amber-600",
+      change: "-",
+      up: false,
+    },
+    {
+      label: "Unread Notices",
+      value: "0",
+      sub: "No new",
+      icon: Megaphone,
+      bg: "bg-violet-50",
+      iconColor: "text-violet-600",
+      change: "-",
+      up: true,
+    },
+  ];
+
   return (
     <div className="space-y-6">
       {/* ── Page Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Welcome{roomData ? `, ${roomData.fullName}` : ""}
+          </h1>
           <p className="text-sm text-gray-400 mt-0.5">
             Overview of your hostel activity and status
           </p>
@@ -173,42 +197,65 @@ export default function StudentDashboard() {
           </div>
         </div>
 
-        {/* Room Details */}
+        {/* Room Details - REAL DATA */}
         <div className="bg-white rounded-2xl border border-gray-100 p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold text-gray-800">Room Details</h3>
-            <span className="text-[11px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
-              Active
-            </span>
+            {roomData && (
+              <span className="text-[11px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                {roomData.status}
+              </span>
+            )}
           </div>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between py-2 border-b border-gray-50">
-              <span className="text-xs text-gray-400">Hostel</span>
-              <span className="text-sm font-medium text-gray-700">Block A — Royal University</span>
-            </div>
-            <div className="flex items-center justify-between py-2 border-b border-gray-50">
-              <span className="text-xs text-gray-400">Room</span>
-              <span className="text-sm font-medium text-gray-700">A-204</span>
-            </div>
-            <div className="flex items-center justify-between py-2 border-b border-gray-50">
-              <span className="text-xs text-gray-400">Type</span>
-              <span className="text-sm font-medium text-gray-700">Triple Sharing</span>
-            </div>
-            <div className="flex items-center justify-between py-2 border-b border-gray-50">
-              <span className="text-xs text-gray-400">Floor</span>
-              <span className="text-sm font-medium text-gray-700">2nd Floor</span>
-            </div>
-            <div className="flex items-center justify-between py-2">
-              <span className="text-xs text-gray-400">Roommates</span>
-              <div className="flex -space-x-2">
-                {["AB", "CD", "EF"].map((init, i) => (
-                  <div key={i} className="w-7 h-7 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 border-2 border-white flex items-center justify-center text-[10px] font-bold text-gray-500">
-                    {init}
-                  </div>
-                ))}
+
+          {loading ? (
+            <p className="text-sm text-gray-400 text-center py-6">Loading...</p>
+          ) : error ? (
+            <p className="text-sm text-gray-400 text-center py-6">{error}</p>
+          ) : (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between py-2 border-b border-gray-50">
+                <span className="text-xs text-gray-400">Hostel</span>
+                <span className="text-sm font-medium text-gray-700">{roomData.hostelName}</span>
+              </div>
+              <div className="flex items-center justify-between py-2 border-b border-gray-50">
+                <span className="text-xs text-gray-400">Building</span>
+                <span className="text-sm font-medium text-gray-700">{roomData.buildingName}</span>
+              </div>
+              <div className="flex items-center justify-between py-2 border-b border-gray-50">
+                <span className="text-xs text-gray-400">Room</span>
+                <span className="text-sm font-medium text-gray-700">{roomData.roomNumber}</span>
+              </div>
+              <div className="flex items-center justify-between py-2 border-b border-gray-50">
+                <span className="text-xs text-gray-400">Floor</span>
+                <span className="text-sm font-medium text-gray-700">{roomData.floorName}</span>
+              </div>
+              <div className="flex items-center justify-between py-2 border-b border-gray-50">
+                <span className="text-xs text-gray-400">Capacity</span>
+                <span className="text-sm font-medium text-gray-700">
+                  {roomData.currentOccupancy} / {roomData.roomCapacity}
+                </span>
+              </div>
+              <div className="flex items-center justify-between py-2">
+                <span className="text-xs text-gray-400">Roommates</span>
+                <div className="flex -space-x-2">
+                  {roomData.roommateNames?.length > 0 ? (
+                    roomData.roommateNames.map((name, i) => (
+                      <div
+                        key={i}
+                        title={name}
+                        className="w-7 h-7 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 border-2 border-white flex items-center justify-center text-[10px] font-bold text-gray-500"
+                      >
+                        {getInitials(name)}
+                      </div>
+                    ))
+                  ) : (
+                    <span className="text-xs text-gray-400">No roommates</span>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Facilities */}
@@ -230,7 +277,6 @@ export default function StudentDashboard() {
             ))}
           </div>
 
-          {/* Roommates info */}
           <div className="mt-5 p-4 rounded-xl bg-gradient-to-br from-blue-50/80 to-indigo-50/50 border border-blue-100/50">
             <div className="flex items-center gap-2 mb-2">
               <CheckCircle2 size={14} className="text-blue-600" />
@@ -243,9 +289,8 @@ export default function StudentDashboard() {
         </div>
       </div>
 
-      {/* ── Bottom Row: Activity + Payments + Announcements ── */}
+      {/* ── Bottom Row: Activity + Payments + Announcements (static, not implemented) ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Recent Activity */}
         <div className="bg-white rounded-2xl border border-gray-100 p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold text-gray-800">Recent Activity</h3>
@@ -271,7 +316,6 @@ export default function StudentDashboard() {
           </div>
         </div>
 
-        {/* Payment Summary */}
         <div className="bg-white rounded-2xl border border-gray-100 p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold text-gray-800">Payment Overview</h3>
@@ -279,21 +323,6 @@ export default function StudentDashboard() {
               View All
             </Link>
           </div>
-
-          {/* Summary bar */}
-          <div className="flex items-center gap-4 mb-5 p-3.5 rounded-xl bg-gradient-to-r from-gray-50 to-gray-100/50 border border-gray-100">
-            <div className="flex-1">
-              <p className="text-[11px] text-gray-400 mb-0.5">Total Paid</p>
-              <p className="text-lg font-bold text-gray-900">₹8,500</p>
-            </div>
-            <div className="w-px h-10 bg-gray-200" />
-            <div className="flex-1">
-              <p className="text-[11px] text-gray-400 mb-0.5">Remaining</p>
-              <p className="text-lg font-bold text-amber-600">₹11,700</p>
-            </div>
-          </div>
-
-          {/* Payment list */}
           <div className="space-y-2.5">
             {PAYMENTS.map(({ name, amount, due, status }) => (
               <div key={name} className="flex items-center justify-between py-2.5 border-b border-gray-50 last:border-0">
@@ -304,13 +333,9 @@ export default function StudentDashboard() {
                 <div className="flex items-center gap-2 ml-3">
                   <span className="text-[13px] font-semibold text-gray-800">{amount}</span>
                   <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                    status === "paid"
-                      ? "bg-emerald-50 text-emerald-600"
-                      : status === "pending"
-                      ? "bg-amber-50 text-amber-600"
-                      : "bg-gray-100 text-gray-500"
+                    status === "paid" ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"
                   }`}>
-                    {status === "paid" ? "Paid" : status === "pending" ? "Due" : "Upcoming"}
+                    {status === "paid" ? "Paid" : "Due"}
                   </span>
                 </div>
               </div>
@@ -318,7 +343,6 @@ export default function StudentDashboard() {
           </div>
         </div>
 
-        {/* Announcements */}
         <div className="bg-white rounded-2xl border border-gray-100 p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold text-gray-800">Latest Announcements</h3>
@@ -336,11 +360,6 @@ export default function StudentDashboard() {
                       {title}
                     </p>
                     <div className="flex items-center gap-2 mt-1.5">
-                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${color}/10 ${
-                        tag === "Academic" ? "text-blue-600" : tag === "Finance" ? "text-amber-600" : "text-emerald-600"
-                      }`} style={{ backgroundColor: `${color === "bg-blue-500" ? "#eff6ff" : color === "bg-amber-500" ? "#fffbeb" : "#ecfdf5"}` }}>
-                        {tag}
-                      </span>
                       <span className="text-[11px] text-gray-300">{date}</span>
                     </div>
                   </div>
@@ -348,19 +367,6 @@ export default function StudentDashboard() {
                 </div>
               </div>
             ))}
-          </div>
-
-          {/* Alert banner */}
-          <div className="mt-4 p-3.5 rounded-xl bg-amber-50/80 border border-amber-100">
-            <div className="flex items-start gap-2.5">
-              <AlertCircle size={16} className="text-amber-500 mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="text-[12px] font-semibold text-amber-800">Fee Deadline Reminder</p>
-                <p className="text-[11px] text-amber-600/70 mt-0.5">
-                  Mess fee for January is due on Jan 20. Pay now to avoid late charges.
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </div>

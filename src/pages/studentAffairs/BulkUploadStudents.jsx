@@ -5,9 +5,15 @@ import { bulkUploadStudents } from "../../service/studentAllocationService";
 import { Upload, CheckCircle, XCircle, GraduationCap, BookOpen, ArrowLeft } from "lucide-react";
 
 const FACULTIES = [
-  "Faculty 01", "Faculty 02", "Faculty 03",
-  "Faculty 04", "Faculty 05", "Faculty 06",
-  "Faculty 07", "Faculty 08", "Faculty 09",
+  "Faculty of Agriculture",
+  "Faculty of Allied Health Sciences",
+  "Faculty of Engineering",
+  "Faculty of Fisheries and Marine Sciences & Technology",
+  "Faculty of Humanities and Social Sciences",
+  "Faculty of Management and Finance",
+  "Faculty of Medicine",
+  "Faculty of Science",
+  "Faculty of Technology",
 ];
 
 const YEARS = ["1st Year", "2nd Year", "3rd Year", "4th Year"];

@@ -1,3 +1,4 @@
+import axios from "axios";
 import api from "./axios";
 
 // BULK UPLOAD STUDENTS VIA EXCEL
@@ -33,4 +34,10 @@ export const deleteAllocation = (id) => {
 
 export const getRoomMembers = (roomId) => {
     return api.get(`/allocations/room/${roomId}`);
+};
+
+export const updateAllocationStatus = (id, status) =>{
+    return axios.put(
+       `/allocations/status/${id}?status=${status}` 
+    );
 };

@@ -1,11 +1,11 @@
 import React, { Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Loading from "./components/Loading.jsx";
-import Students from "./pages/studentAffairs/Students";
 import FloorRooms from "./pages/studentAffairs/FloorRooms.jsx";
 import BuildingDetails from "./pages/studentAffairs/BuildingDetails";
 import Hostel from "./pages/studentAffairs/Hostels.jsx";
 import ManageHostel from "./pages/studentAffairs/ManageHostel";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 
 // Loading delay (Demo purpose)
@@ -64,6 +64,9 @@ const Payments = lazy(() =>
 const Notifications = lazy(() =>
   import("./pages/Student/Notifications.jsx")
 );
+ const ChangePassword = lazy (()=>
+import("./pages/ChangePassword.jsx")
+);
 
 /* =========================
    STUDENT AFFAIRS MODULE
@@ -105,13 +108,14 @@ export default function App() {
 
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/change-password" element={<ChangePassword/>} />
           <Route path="/about" element={<About />} />
 
           {/* =========================
               STUDENT ROUTES
           ========================= */}
 
-          <Route path="/student" element={<StudentLayout />}>
+          <Route path="/student" element={<ProtectedRoute allowedRole= "STUDENT"><StudentLayout /></ProtectedRoute>}>
             <Route index element={<StudentDashboard />} />
             <Route path="complaints" element={<Complaints />} />
             <Route path="canteen" element={<Canteen />} />
@@ -123,10 +127,9 @@ export default function App() {
               STUDENT AFFAIRS ROUTES
           ========================= */}
 
-          <Route path="/student-affairs" element={<StudentAffairsLayout />}>
+          <Route path="/student-affairs" element={<ProtectedRoute allowedRole="STUDENT_AFFAIRS"><StudentAffairsLayout /></ProtectedRoute>}>
             <Route index element={<StudentAffairsDashboard />} />
             <Route path="dashboard" element={<StudentAffairsDashboard />} />
-            <Route path="students" element={<Students />} />
             <Route path="hostel" element={<Hostel />} />
             <Route path="manage-hostel/:id" element={<ManageHostel />} />
             <Route path="floor/:id" element={<FloorRooms />} />

@@ -48,6 +48,11 @@ export default function LoginPage() {
       localStorage.setItem("username", data.username);
       localStorage.setItem("role", data.role);
 
+      if(data.forcePasswordChange){
+        navigate("/change-password");
+        return;
+      }
+
       switch (data.role) {
         case "STUDENT":
           navigate("/student");

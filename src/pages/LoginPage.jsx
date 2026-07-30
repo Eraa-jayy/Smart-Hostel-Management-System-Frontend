@@ -19,6 +19,7 @@ const ROLES = [
   { label: "Sub Warden", value: "SUB_WARDEN" },
   { label: "Maintenance Unit", value: "MAINTENANCE" },
   { label: "Hostel Canteen Staff", value: "CANTEEN" },
+  { label: "system administration",value: "ADMIN"},
 ];
 
 export default function LoginPage() {
@@ -55,6 +56,10 @@ export default function LoginPage() {
       }
 
       switch (data.role) {
+
+        case "ADMIN":
+          navigate("/admin");
+          break;
         case "STUDENT":
           navigate("/student");
           break;

@@ -31,7 +31,7 @@ const BuildingDetails = () => {
 
   if (!building) {
     return (
-      <div className="p-10">
+      <div className="p-10 text-gray-400">
         Building not found
       </div>
     );
@@ -54,39 +54,39 @@ const BuildingDetails = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="space-y-6">
       {/* Building Header */}
-      <div className="bg-white rounded-2xl shadow p-6 mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">
+      <div className="bg-white rounded-2xl border border-gray-100 p-5">
+        <h1 className="text-2xl font-bold text-gray-900">
           {building.buildingName}
         </h1>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mt-6">
-          <div>
-            <p className="text-gray-500">Floors</p>
-            <h3 className="font-bold text-xl">{floors.length}</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mt-5">
+          <div className="p-3 bg-gray-50 rounded-xl">
+            <p className="text-xs text-gray-400">Floors</p>
+            <h3 className="text-lg font-bold text-gray-800">{floors.length}</h3>
           </div>
-          <div>
-            <p className="text-gray-500">Rooms</p>
-            <h3 className="font-bold text-xl">{totalRooms}</h3>
+          <div className="p-3 bg-gray-50 rounded-xl">
+            <p className="text-xs text-gray-400">Rooms</p>
+            <h3 className="text-lg font-bold text-gray-800">{totalRooms}</h3>
           </div>
-          <div>
-            <p className="text-gray-500">Capacity</p>
-            <h3 className="font-bold text-xl">{totalCapacity}</h3>
+          <div className="p-3 bg-gray-50 rounded-xl">
+            <p className="text-xs text-gray-400">Capacity</p>
+            <h3 className="text-lg font-bold text-gray-800">{totalCapacity}</h3>
           </div>
-          <div>
-            <p className="text-gray-500">Hostel ID</p>
-            <h3 className="font-bold text-xl">{building.hostelId}</h3>
+          <div className="p-3 bg-gray-50 rounded-xl">
+            <p className="text-xs text-gray-400">Hostel ID</p>
+            <h3 className="text-lg font-bold text-gray-800">{building.hostelId}</h3>
           </div>
         </div>
       </div>
 
       {/* Floors */}
-      <h2 className="text-xl font-semibold mb-5">
+      <h2 className="text-sm font-semibold text-gray-800">
         Building Floors
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {floors.map((floor) => (
           <FloorCard
             key={floor.id}

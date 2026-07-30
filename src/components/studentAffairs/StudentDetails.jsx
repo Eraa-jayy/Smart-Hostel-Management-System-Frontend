@@ -1,30 +1,46 @@
 import React from "react";
+import { X } from "lucide-react";
 
 export default function StudentDetails({ student, close }) {
   if (!student) return null;
 
   return (
     <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
-      <div className="bg-white rounded-xl p-6 w-[500px]">
-        <h2 className="text-2xl font-bold mb-5">
-          Student Details
-        </h2>
+      <div className="bg-white rounded-2xl p-6 w-[500px] shadow-xl border border-gray-100">
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-lg font-bold text-gray-900">
+            Student Details
+          </h2>
+          <button
+            onClick={close}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <X size={20} />
+          </button>
+        </div>
 
-        <div className="space-y-2">
-          <p><strong>Student ID:</strong> {student.studentId}</p>
-          <p><strong>Name:</strong> {student.name}</p>
-          <p><strong>Faculty:</strong> {student.faculty}</p>
-          <p><strong>Year:</strong> {student.year}</p>
-          <p><strong>Email:</strong> {student.email}</p>
-          <p><strong>Phone:</strong> {student.phone}</p>
-          <p><strong>Hostel:</strong> {student.hostel}</p>
-          <p><strong>Room:</strong> {student.room}</p>
-          <p><strong>Status:</strong> {student.status}</p>
+        <div className="space-y-3">
+          {[
+            { label: "Student ID", value: student.studentId },
+            { label: "Name", value: student.name },
+            { label: "Faculty", value: student.faculty },
+            { label: "Year", value: student.year },
+            { label: "Email", value: student.email },
+            { label: "Phone", value: student.phone },
+            { label: "Hostel", value: student.hostel },
+            { label: "Room", value: student.room },
+            { label: "Status", value: student.status },
+          ].map(({ label, value }) => (
+            <div key={label} className="flex justify-between py-2 border-b border-gray-50">
+              <span className="text-xs text-gray-400">{label}</span>
+              <span className="text-sm font-medium text-gray-700">{value}</span>
+            </div>
+          ))}
         </div>
 
         <button
           onClick={close}
-          className="mt-6 w-full bg-red-500 text-white py-3 rounded-lg"
+          className="mt-6 w-full bg-red-500 text-white py-2.5 rounded-xl hover:bg-red-600 transition font-semibold text-sm"
         >
           Close
         </button>

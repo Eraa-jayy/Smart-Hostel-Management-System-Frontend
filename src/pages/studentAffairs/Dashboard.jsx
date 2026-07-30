@@ -12,7 +12,7 @@ const StudentAffairsDashboard = () => {
   const [hostels, setHostels] = useState([]);
   const [buildings, setBuildings] = useState([]);
   const [allocations, setAllocations] = useState([]);
-  const [hostelOccupancy, setHostelOccupancy] = useState([]);   // ===== NEW =====
+  const [hostelOccupancy, setHostelOccupancy] = useState([]);
   const [stats, setStats] = useState({
     totalRooms: 0,
     totalCapacity: 0,
@@ -40,14 +40,13 @@ const StudentAffairsDashboard = () => {
         buildingsRes.data.map(async (b) => {
           try {
             const detail = await getBuildingById(b.id);
-            return { ...detail.data, hostelId: b.hostelId };   // hostelId eka save karagannawa
+            return { ...detail.data, hostelId: b.hostelId };
           } catch {
             return b;
           }
         })
       );
 
-      // Overall stats
       let totalRooms = 0;
       let totalCapacity = 0;
       let totalOccupied = 0;
@@ -66,7 +65,6 @@ const StudentAffairsDashboard = () => {
 
       setStats({ totalRooms, totalCapacity, totalOccupied });
 
-      // ===== NEW: Hostel-wise occupancy calculate karanawa =====
       const occupancyData = hostelsRes.data.map((hostel) => {
         const hostelBuildings = buildingDetails.filter(
           (b) => Number(b.hostelId) === Number(hostel.id)
@@ -127,73 +125,85 @@ const StudentAffairsDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">
-          Student Affairs Dashboard
-        </h1>
-        <p className="text-gray-500 mt-2">
-          Manage university hostels and student allocations
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Student Affairs Dashboard
+          </h1>
+          <p className="text-sm text-gray-400 mt-0.5">
+            Manage university hostels and student allocations
+          </p>
+        </div>
       </div>
 
       {/* Overview Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-5 mb-10">
-        <div className="bg-white p-5 rounded-xl shadow flex items-center gap-3">
-          <div className="bg-blue-100 p-3 rounded-lg">
-            <Building2 className="text-blue-600" size={22} />
-          </div>
-          <div>
-            <p className="text-2xl font-bold">{hostels.length}</p>
-            <p className="text-xs text-gray-500">Hostels</p>
-          </div>
-        </div>
-
-        <div className="bg-white p-5 rounded-xl shadow flex items-center gap-3">
-          <div className="bg-indigo-100 p-3 rounded-lg">
-            <Layers className="text-indigo-600" size={22} />
-          </div>
-          <div>
-            <p className="text-2xl font-bold">{buildings.length}</p>
-            <p className="text-xs text-gray-500">Buildings</p>
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:shadow-gray-200/50 hover:border-gray-200 transition-all duration-300">
+          <div className="flex items-center gap-3">
+            <div className="bg-blue-50 w-11 h-11 rounded-xl flex items-center justify-center">
+              <Building2 className="text-blue-600" size={20} />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-gray-900">{hostels.length}</p>
+              <p className="text-xs text-gray-400">Hostels</p>
+            </div>
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-xl shadow flex items-center gap-3">
-          <div className="bg-green-100 p-3 rounded-lg">
-            <DoorOpen className="text-green-600" size={22} />
-          </div>
-          <div>
-            <p className="text-2xl font-bold">{stats.totalRooms}</p>
-            <p className="text-xs text-gray-500">Rooms</p>
-          </div>
-        </div>
-
-        <div className="bg-white p-5 rounded-xl shadow flex items-center gap-3">
-          <div className="bg-orange-100 p-3 rounded-lg">
-            <Users className="text-orange-600" size={22} />
-          </div>
-          <div>
-            <p className="text-2xl font-bold">{activeAllocations.length}</p>
-            <p className="text-xs text-gray-500">Students Allocated</p>
+        <div className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:shadow-gray-200/50 hover:border-gray-200 transition-all duration-300">
+          <div className="flex items-center gap-3">
+            <div className="bg-indigo-50 w-11 h-11 rounded-xl flex items-center justify-center">
+              <Layers className="text-indigo-600" size={20} />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-gray-900">{buildings.length}</p>
+              <p className="text-xs text-gray-400">Buildings</p>
+            </div>
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-xl shadow flex items-center gap-3">
-          <div className="bg-purple-100 p-3 rounded-lg">
-            <PieChart className="text-purple-600" size={22} />
+        <div className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:shadow-gray-200/50 hover:border-gray-200 transition-all duration-300">
+          <div className="flex items-center gap-3">
+            <div className="bg-emerald-50 w-11 h-11 rounded-xl flex items-center justify-center">
+              <DoorOpen className="text-emerald-600" size={20} />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-gray-900">{stats.totalRooms}</p>
+              <p className="text-xs text-gray-400">Rooms</p>
+            </div>
           </div>
-          <div>
-            <p className="text-2xl font-bold">{occupancyPercent}%</p>
-            <p className="text-xs text-gray-500">Occupancy</p>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:shadow-gray-200/50 hover:border-gray-200 transition-all duration-300">
+          <div className="flex items-center gap-3">
+            <div className="bg-orange-50 w-11 h-11 rounded-xl flex items-center justify-center">
+              <Users className="text-orange-600" size={20} />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-gray-900">{activeAllocations.length}</p>
+              <p className="text-xs text-gray-400">Students Allocated</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:shadow-gray-200/50 hover:border-gray-200 transition-all duration-300">
+          <div className="flex items-center gap-3">
+            <div className="bg-purple-50 w-11 h-11 rounded-xl flex items-center justify-center">
+              <PieChart className="text-purple-600" size={20} />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-gray-900">{occupancyPercent}%</p>
+              <p className="text-xs text-gray-400">Occupancy</p>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* ===== NEW: Hostel-wise Occupancy Chart ===== */}
-      <div className="bg-white rounded-xl shadow p-6 mb-10">
-        <h2 className="text-xl font-semibold mb-6 text-gray-700">
+      {/* Hostel-wise Occupancy Chart */}
+      <div className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:shadow-gray-200/50 hover:border-gray-200 transition-all duration-300">
+        <h2 className="text-sm font-semibold text-gray-800 mb-4">
           Hostel-wise Occupancy
         </h2>
 
@@ -228,16 +238,16 @@ const StudentAffairsDashboard = () => {
       </div>
 
       {/* Hostel Cards */}
-      <h2 className="text-xl font-semibold mb-5 text-gray-700">
+      <h2 className="text-sm font-semibold text-gray-800">
         University Hostels
       </h2>
 
       {hostels.length === 0 ? (
-        <div className="bg-white p-10 rounded-xl shadow text-center text-gray-400">
+        <div className="bg-white rounded-2xl border border-gray-100 p-10 text-center text-gray-400">
           No hostels found.
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {hostels.map((hostel) => (
             <HostelCard
               key={hostel.id}

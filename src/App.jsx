@@ -97,6 +97,17 @@ import("./pages/studentAffairs/StudentProfile.jsx")
 );
 
 /* =========================
+   SUB WARDEN MODULE
+========================= */
+
+const SubWardenLayout = lazy(() => import("./layout/SubWardenLayout.jsx"));
+const SubWardenDashboard = lazy(() => import("./pages/SubWarden/Dashboard.jsx"));
+const StudentAllocation = lazy(() => import("./pages/SubWarden/StudentAllocation.jsx"));
+const InventoryManagement = lazy(() => import("./pages/SubWarden/InventoryManagement.jsx"));
+const SubWardenComplaints = lazy(() => import("./pages/SubWarden/Complaints.jsx"));
+const HostelConfig = lazy(() => import("./pages/SubWarden/HostelConfig.jsx"));
+
+/* =========================
    SYSTEM ADMIN MODULE
 ========================= */
 
@@ -152,6 +163,18 @@ export default function App() {
             <Route path="bulk-upload" element={<BulkUploadStudents />} />
             <Route path="allocations" element={<Allocations />} />
             <Route path ="student/:id" element={<StudentProfile/>}/>
+            </Route>
+
+            {/* =========================
+               SUB WARDEN ROUTES
+            ========================= */}
+            <Route path="/subwarden" element={<ProtectedRoute allowedRole="SUB_WARDEN"><SubWardenLayout /></ProtectedRoute>}>
+              <Route index element={<SubWardenDashboard />} />
+              <Route path="dashboard" element={<SubWardenDashboard />} />
+              <Route path="allocations" element={<StudentAllocation />} />
+              <Route path="inventory" element={<InventoryManagement />} />
+              <Route path="complaints" element={<SubWardenComplaints />} />
+              <Route path="config" element={<HostelConfig />} />
             </Route>
 
             {/* =========================

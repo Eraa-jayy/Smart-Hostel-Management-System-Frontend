@@ -1,0 +1,1 @@
+import{d as e}from"./index-Bzb6rxqU.js";const r=()=>e.get("/users"),u=s=>e.get(`/users/${s}`),a=s=>e.post("/users",s),o=s=>e.put(`/users/${s}/toggle-status`),n=s=>e.delete(`/users/${s}`);export{u as a,a as c,n as d,r as g,o as t};

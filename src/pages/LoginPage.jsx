@@ -67,6 +67,7 @@ export default function LoginPage() {
           navigate("/student-affairs");
           break;
         case "SUB_WARDEN":
+        case "SUBWARDEN":
           navigate("/subwarden");
           break;
         case "WARDEN":

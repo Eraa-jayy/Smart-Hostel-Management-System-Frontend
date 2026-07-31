@@ -6,7 +6,7 @@ import {
   getAllBuildings,
   getBuildingById,
 } from "../../service/buildingService";
-import { Building2, Layers, DoorOpen, Users, Plus } from "lucide-react";
+import { Building2, Layers, DoorOpen, Users, Plus, X } from "lucide-react";
 
 export default function ManageHostel() {
   const { id } = useParams();
@@ -21,10 +21,6 @@ export default function ManageHostel() {
     roomsPerFloor: "",
     roomCapacity: "",
   });
-
-  // ==========================
-  // LOAD DATA
-  // ==========================
 
   useEffect(() => {
     loadHostel();
@@ -64,20 +60,12 @@ export default function ManageHostel() {
     }
   };
 
-  // ==========================
-  // INPUT CHANGE
-  // ==========================
-
   const handleBuildingChange = (e) => {
     setBuildingData({
       ...buildingData,
       [e.target.name]: e.target.value,
     });
   };
-
-  // ==========================
-  // CREATE BUILDING
-  // ==========================
 
   const handleCreateBuilding = async (e) => {
     e.preventDefault();
@@ -106,10 +94,6 @@ export default function ManageHostel() {
       alert("Building creation failed");
     }
   };
-
-  // ==========================
-  // HELPER: Get building stats
-  // ==========================
 
   const getBuildingStats = (building) => {
     const floorsFromApi = building.floors || [];
@@ -144,114 +128,128 @@ export default function ManageHostel() {
   }
 
   return (
-    <div className="p-8 bg-gray-100 min-h-screen">
+    <div className="space-y-6">
       {/* HEADER SECTION */}
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">
+          <h1 className="text-2xl font-bold text-gray-900">
             {hostel.hostelName}
           </h1>
-          <p className="mt-2">
-            Type: {hostel.hostelType}
-          </p>
-          <p>
-            Location: {hostel.location}
-          </p>
-          <p>
-            Capacity: {hostel.totalCapacity}
+          <p className="text-sm text-gray-400 mt-0.5">
+            Type: {hostel.hostelType} · Location: {hostel.location} · Capacity: {hostel.totalCapacity}
           </p>
         </div>
 
         <button
           onClick={() => setShowBuildingForm(true)}
-          className="bg-green-600 text-white px-6 py-3 rounded-lg shadow flex items-center gap-2"
+          className="bg-green-600 text-white px-4 py-2.5 rounded-xl hover:bg-green-700 transition flex items-center gap-2 text-sm font-semibold self-start"
         >
-          <Plus size={18} />
+          <Plus size={16} />
           Create Building
         </button>
       </div>
 
       {/* BUILDING FORM */}
       {showBuildingForm && (
-        <div className="bg-white p-6 rounded-xl shadow mb-8">
-          <h2 className="text-xl font-bold mb-5">
-            Create New Building
-          </h2>
+        <div className="bg-white rounded-2xl border border-gray-100 p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-semibold text-gray-800">Create New Building</h2>
+            <button
+              type="button"
+              onClick={() => setShowBuildingForm(false)}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X size={18} />
+            </button>
+          </div>
 
           <form onSubmit={handleCreateBuilding}>
-            <input
-              name="buildingName"
-              placeholder="Building Name"
-              value={buildingData.buildingName}
-              onChange={handleBuildingChange}
-              className="border p-3 rounded w-full mb-3"
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <input
+                name="buildingName"
+                placeholder="Building Name"
+                value={buildingData.buildingName}
+                onChange={handleBuildingChange}
+                className="border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
+                required
+              />
+              <input
+                type="number"
+                name="numberOfFloors"
+                placeholder="Number of Floors"
+                value={buildingData.numberOfFloors}
+                onChange={handleBuildingChange}
+                className="border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
+                required
+              />
+              <input
+                type="number"
+                name="roomsPerFloor"
+                placeholder="Rooms Per Floor"
+                value={buildingData.roomsPerFloor}
+                onChange={handleBuildingChange}
+                className="border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
+                required
+              />
+              <input
+                type="number"
+                name="roomCapacity"
+                placeholder="Room Capacity"
+                value={buildingData.roomCapacity}
+                onChange={handleBuildingChange}
+                className="border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
+                required
+              />
+            </div>
 
-            <input
-              type="number"
-              name="numberOfFloors"
-              placeholder="Number of Floors"
-              value={buildingData.numberOfFloors}
-              onChange={handleBuildingChange}
-              className="border p-3 rounded w-full mb-3"
-            />
-
-            <input
-              type="number"
-              name="roomsPerFloor"
-              placeholder="Rooms Per Floor"
-              value={buildingData.roomsPerFloor}
-              onChange={handleBuildingChange}
-              className="border p-3 rounded w-full mb-3"
-            />
-
-            <input
-              type="number"
-              name="roomCapacity"
-              placeholder="Room Capacity"
-              value={buildingData.roomCapacity}
-              onChange={handleBuildingChange}
-              className="border p-3 rounded w-full mb-3"
-            />
-
-            <button className="bg-blue-600 text-white px-5 py-3 rounded-lg">
-              Save Building
-            </button>
+            <div className="flex gap-2">
+              <button
+                type="submit"
+                className="bg-blue-600 text-white px-5 py-2.5 rounded-xl hover:bg-blue-700 transition font-semibold text-sm"
+              >
+                Save Building
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowBuildingForm(false)}
+                className="bg-gray-100 text-gray-600 px-5 py-2.5 rounded-xl hover:bg-gray-200 transition font-semibold text-sm"
+              >
+                Cancel
+              </button>
+            </div>
           </form>
         </div>
       )}
 
       {/* BUILDING LIST */}
       <div>
-        <h2 className="text-2xl font-bold mb-5">
-          Buildings
-        </h2>
+        <h2 className="text-sm font-semibold text-gray-800 mb-4">Buildings</h2>
 
         {buildings.length === 0 ? (
-          <div className="bg-white p-10 rounded-xl shadow text-center text-gray-400">
+          <div className="bg-white rounded-2xl border border-gray-100 p-10 text-center text-gray-400">
             No buildings found. Create one to get started.
           </div>
         ) : (
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 gap-4">
             {buildings.map((building) => {
               const stats = getBuildingStats(building);
 
               return (
                 <div
                   key={building.id}
-                  className="bg-white rounded-xl shadow-md hover:shadow-xl transition overflow-hidden"
+                  className="bg-white rounded-2xl border border-gray-100 hover:shadow-lg hover:shadow-gray-200/50 hover:border-gray-200 transition-all duration-300 overflow-hidden"
                 >
                   {/* Card Header */}
                   <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-5">
                     <div className="flex items-center gap-3">
                       <div className="bg-white/20 p-2 rounded-lg">
-                        <Building2 size={22} className="text-white" />
+                        <Building2 size={20} className="text-white" />
                       </div>
-                      <div>
-                        <h3 className="text-lg font-bold text-white">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-base font-bold text-white truncate">
                           {building.buildingName}
                         </h3>
-                        <p className="text-white/70 text-sm">
+                        <p className="text-white/70 text-xs">
                           {building.description || "Hostel Building"}
                         </p>
                       </div>
@@ -261,48 +259,47 @@ export default function ManageHostel() {
                   {/* Card Body */}
                   <div className="p-5">
                     <div className="grid grid-cols-3 gap-3 mb-5">
-                      <div className="text-center p-3 bg-gray-50 rounded-lg">
-                        <Layers size={18} className="mx-auto text-indigo-500 mb-1" />
+                      <div className="text-center p-3 bg-gray-50 rounded-xl">
+                        <Layers size={16} className="mx-auto text-indigo-500 mb-1" />
                         <p className="text-lg font-bold text-gray-800">
                           {stats.floorsCount}
                         </p>
-                        <p className="text-[11px] text-gray-400">Floors</p>
+                        <p className="text-[10px] text-gray-400">Floors</p>
                       </div>
 
-                      <div className="text-center p-3 bg-gray-50 rounded-lg">
-                        <DoorOpen size={18} className="mx-auto text-blue-500 mb-1" />
+                      <div className="text-center p-3 bg-gray-50 rounded-xl">
+                        <DoorOpen size={16} className="mx-auto text-blue-500 mb-1" />
                         <p className="text-lg font-bold text-gray-800">
                           {stats.totalRooms}
                         </p>
-                        <p className="text-[11px] text-gray-400">Rooms</p>
+                        <p className="text-[10px] text-gray-400">Rooms</p>
                       </div>
 
-                      <div className="text-center p-3 bg-gray-50 rounded-lg">
-                        <Users size={18} className="mx-auto text-emerald-500 mb-1" />
+                      <div className="text-center p-3 bg-gray-50 rounded-xl">
+                        <Users size={16} className="mx-auto text-emerald-500 mb-1" />
                         <p className="text-lg font-bold text-gray-800">
                           {stats.totalCapacity}
                         </p>
-                        <p className="text-[11px] text-gray-400">Capacity</p>
+                        <p className="text-[10px] text-gray-400">Capacity</p>
                       </div>
                     </div>
 
-                    {/* Details */}
-                    <div className="space-y-2 text-sm mb-5">
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Floors</span>
-                        <span className="font-semibold">
+                    <div className="space-y-2 mb-4">
+                      <div className="flex justify-between py-1.5 border-b border-gray-50">
+                        <span className="text-xs text-gray-400">Floors</span>
+                        <span className="text-sm font-semibold text-gray-700">
                           {building.numberOfFloors || "-"}
                         </span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Rooms per Floor</span>
-                        <span className="font-semibold">
+                      <div className="flex justify-between py-1.5 border-b border-gray-50">
+                        <span className="text-xs text-gray-400">Rooms per Floor</span>
+                        <span className="text-sm font-semibold text-gray-700">
                           {building.roomsPerFloor || "-"}
                         </span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Room Capacity</span>
-                        <span className="font-semibold">
+                      <div className="flex justify-between py-1.5 border-b border-gray-50">
+                        <span className="text-xs text-gray-400">Room Capacity</span>
+                        <span className="text-sm font-semibold text-gray-700">
                           {building.roomCapacity || "-"}
                         </span>
                       </div>
@@ -312,7 +309,7 @@ export default function ManageHostel() {
                       onClick={() => {
                         navigate(`/student-affairs/building/${building.id}`);
                       }}
-                      className="w-full bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition font-semibold"
+                      className="w-full bg-blue-600 text-white px-4 py-2.5 rounded-xl hover:bg-blue-700 transition font-semibold text-sm"
                     >
                       View Building
                     </button>

@@ -47,32 +47,23 @@ export default function Allocations() {
   };
 
   const handleStatusChange = async (allocation) => {
-
     const newStatus =
-        allocation.status === "ACTIVE"
+      allocation.status === "ACTIVE"
         ? "INACTIVE"
         : "ACTIVE";
 
     try {
-
-        await updateAllocationStatus(
-         allocation.id,
+      await updateAllocationStatus(
+        allocation.id,
         newStatus
-        );
+      );
+      alert(`Student is now ${newStatus}`);
+      loadAllocations();
+    } catch (error) {
+      alert("Failed to update status");
+    }
+  };
 
-        alert(`Student is now ${newStatus}`);
-
-        loadAllocations();
-
-        } catch (error) {
-
-        
-
-        alert("Failed to update status");
-        }
-    };
-
-  // ===== NEW: academicYear string eka "Faculty XX - Nth Year" widiyata split karanawa =====
   const parseAcademicYear = (academicYear) => {
     if (!academicYear) return { faculty: "-", year: "-" };
     const parts = academicYear.split(" - ");
@@ -82,7 +73,6 @@ export default function Allocations() {
     };
   };
 
-  // ===== NEW: Unique faculty/year list eka data eken auto-generate karanawa =====
   const facultyOptions = [
     ...new Set(
       allocations.map((a) => parseAcademicYear(a.academicYear).faculty)
@@ -95,7 +85,6 @@ export default function Allocations() {
     ),
   ].filter((y) => y !== "-");
 
-  // Filter + search karana logic eka
   const filteredAllocations = allocations.filter((a) => {
     const { faculty, year } = parseAcademicYear(a.academicYear);
 
@@ -117,71 +106,79 @@ export default function Allocations() {
   });
 
   return (
-    <div className="p-8 bg-gray-100 min-h-screen">
-      <h1 className="text-3xl font-bold mb-8">Student Allocations</h1>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Student Allocations</h1>
+        <p className="text-sm text-gray-400 mt-0.5">Manage room allocations for students</p>
+      </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-5 mb-8">
-        <div className="bg-white p-5 rounded-xl shadow flex items-center gap-3">
-          <div className="bg-blue-100 p-3 rounded-lg">
-            <Users className="text-blue-600" size={22} />
-          </div>
-          <div>
-            <p className="text-2xl font-bold">{allocations.length}</p>
-            <p className="text-sm text-gray-500">Total Allocations</p>
-          </div>
-        </div>
-
-        <div className="bg-white p-5 rounded-xl shadow flex items-center gap-3">
-          <div className="bg-green-100 p-3 rounded-lg">
-            <DoorOpen className="text-green-600" size={22} />
-          </div>
-          <div>
-            <p className="text-2xl font-bold">
-              {allocations.filter((a) => a.status === "ACTIVE").length}
-            </p>
-            <p className="text-sm text-gray-500">Active</p>
+      <div className="grid grid-cols-3 gap-4">
+        <div className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:shadow-gray-200/50 hover:border-gray-200 transition-all duration-300">
+          <div className="flex items-center gap-3">
+            <div className="bg-blue-50 w-11 h-11 rounded-xl flex items-center justify-center">
+              <Users className="text-blue-600" size={20} />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-gray-900">{allocations.length}</p>
+              <p className="text-xs text-gray-400">Total Allocations</p>
+            </div>
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-xl shadow flex items-center gap-3">
-          <div className="bg-gray-200 p-3 rounded-lg">
-            <LogOut className="text-gray-600" size={22} />
+        <div className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:shadow-gray-200/50 hover:border-gray-200 transition-all duration-300">
+          <div className="flex items-center gap-3">
+            <div className="bg-emerald-50 w-11 h-11 rounded-xl flex items-center justify-center">
+              <DoorOpen className="text-emerald-600" size={20} />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-gray-900">
+                {allocations.filter((a) => a.status === "ACTIVE").length}
+              </p>
+              <p className="text-xs text-gray-400">Active</p>
+            </div>
           </div>
-          <div>
-            <p className="text-2xl font-bold">
-              {allocations.filter((a) => a.status === "INACTIVE").length}
-            </p>
-            <p className="text-sm text-gray-500">Released</p>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:shadow-gray-200/50 hover:border-gray-200 transition-all duration-300">
+          <div className="flex items-center gap-3">
+            <div className="bg-gray-100 w-11 h-11 rounded-xl flex items-center justify-center">
+              <LogOut className="text-gray-500" size={20} />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-gray-900">
+                {allocations.filter((a) => a.status === "INACTIVE").length}
+              </p>
+              <p className="text-xs text-gray-400">Released</p>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white p-4 rounded-xl shadow mb-5 flex flex-wrap gap-4">
+      <div className="bg-white rounded-2xl border border-gray-100 p-4 flex flex-wrap gap-3">
         <input
           type="text"
           placeholder="Search by name, reg no, or room..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="border p-2.5 rounded-lg flex-1 min-w-[200px]"
+          className="border border-gray-200 p-2.5 rounded-xl flex-1 min-w-[200px] text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
         />
 
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="border p-2.5 rounded-lg"
+          className="border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
         >
           <option value="ALL">All Status</option>
           <option value="ACTIVE">Active</option>
           <option value="INACTIVE">Released</option>
         </select>
 
-        {/* ===== NEW: Faculty filter ===== */}
         <select
           value={facultyFilter}
           onChange={(e) => setFacultyFilter(e.target.value)}
-          className="border p-2.5 rounded-lg"
+          className="border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
         >
           <option value="ALL">All Faculties</option>
           {facultyOptions.map((f) => (
@@ -191,11 +188,10 @@ export default function Allocations() {
           ))}
         </select>
 
-        {/* ===== NEW: Year filter ===== */}
         <select
           value={yearFilter}
           onChange={(e) => setYearFilter(e.target.value)}
-          className="border p-2.5 rounded-lg"
+          className="border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
         >
           <option value="ALL">All Years</option>
           {yearOptions.map((y) => (
@@ -207,7 +203,7 @@ export default function Allocations() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl shadow overflow-hidden">
+      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
         {loading ? (
           <div className="p-10 text-center text-gray-400">Loading...</div>
         ) : filteredAllocations.length === 0 ? (
@@ -216,56 +212,60 @@ export default function Allocations() {
           </div>
         ) : (
           <table className="w-full text-sm text-left">
-            <thead className="bg-gray-50 border-b">
+            <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
-                <th className="p-3">Reg No</th>
-                <th className="p-3">Student Name</th>
-                <th className="p-3">Room</th>
-                <th className="p-3">Faculty</th>
-                <th className="p-3">Year</th>
-                <th className="p-3">Allocated Date</th>
-                <th className="p-3">Status</th>
-                <th className="p-3">Action</th>
+                <th className="p-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Reg No</th>
+                <th className="p-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Student Name</th>
+                <th className="p-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Room</th>
+                <th className="p-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Faculty</th>
+                <th className="p-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Year</th>
+                <th className="p-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Allocated Date</th>
+                <th className="p-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="p-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Action</th>
               </tr>
             </thead>
             <tbody>
               {filteredAllocations.map((a) => {
                 const { faculty, year } = parseAcademicYear(a.academicYear);
                 return (
-                  <tr key={a.id} className="border-b hover:bg-gray-50">
-                    <td className="p-3">{a.registrationNumber}</td>
-                    <td className="p-3 font-medium">{a.studentName}</td>
-                    <td className="p-3 flex items-center gap-1">
-                      <DoorOpen size={14} className="text-gray-400" />
-                      {a.roomNumber}
+                  <tr key={a.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
+                    <td className="p-3 text-gray-700">{a.registrationNumber}</td>
+                    <td className="p-3 font-medium text-gray-800">{a.studentName}</td>
+                    <td className="p-3">
+                      <div className="flex items-center gap-1.5">
+                        <DoorOpen size={14} className="text-gray-400" />
+                        <span className="text-gray-700">{a.roomNumber}</span>
+                      </div>
                     </td>
-                    <td className="p-3">{faculty}</td>
-                    <td className="p-3">{year}</td>
-                    <td className="p-3 flex items-center gap-1">
-                      <Calendar size={14} className="text-gray-400" />
-                      {a.allocatedDate}
+                    <td className="p-3 text-gray-600">{faculty}</td>
+                    <td className="p-3 text-gray-600">{year}</td>
+                    <td className="p-3">
+                      <div className="flex items-center gap-1.5">
+                        <Calendar size={14} className="text-gray-400" />
+                        <span className="text-gray-600">{a.allocatedDate}</span>
+                      </div>
                     </td>
                     <td className="p-3">
-                        <button
+                      <button
                         onClick={() => handleStatusChange(a)}
                         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 ${
-                        a.status === "ACTIVE" ? "bg-green-500" : "bg-red-500"
-                         }`}
-                        >
-                            <span
-                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${
+                          a.status === "ACTIVE" ? "bg-green-500" : "bg-red-500"
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${
                             a.status === "ACTIVE"
-                            ? "translate-x-6"
-                            : "translate-x-1"
-                            }`}
-                            />
-                        </button>
+                              ? "translate-x-6"
+                              : "translate-x-1"
+                          }`}
+                        />
+                      </button>
                     </td>
                     <td className="p-3">
                       {a.status === "ACTIVE" && (
                         <button
                           onClick={() => handleRelease(a.id)}
-                          className="text-red-600 hover:underline text-xs font-semibold"
+                          className="text-red-500 hover:text-red-700 text-xs font-semibold hover:underline transition-colors"
                         >
                           Release
                         </button>

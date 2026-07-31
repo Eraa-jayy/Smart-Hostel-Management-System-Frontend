@@ -6,7 +6,7 @@ import BuildingDetails from "./pages/studentAffairs/BuildingDetails";
 import Hostel from "./pages/studentAffairs/Hostels.jsx";
 import ManageHostel from "./pages/studentAffairs/ManageHostel";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
-
+import AdminLayout from "./layout/AdminLayout";
 
 // Loading delay (Demo purpose)
 const delay = (ms) =>
@@ -96,6 +96,20 @@ const StudentProfile = lazy(()=>
 import("./pages/studentAffairs/StudentProfile.jsx")
 );
 
+/* =========================
+   SYSTEM ADMIN MODULE
+========================= */
+
+
+const Dashbord = lazy(() => import("./pages/admin/DashBord.jsx"));
+const Users = lazy(() => import("./pages/admin/Users.jsx"));
+const CreateUser = lazy(() => import("./pages/admin/CreateUser.jsx"));
+const UserDetails = lazy(() => import("./pages/admin/UserDetails.jsx"));
+const ManageRoles = lazy(() => import("./pages/admin/ManageRoles.jsx"));
+const StudentAffairsAccounts = lazy(() => import("./pages/admin/StudentAffairsAccounts.jsx"));
+const AdminProfile = lazy(() => import("./pages/admin/AdminProfile.jsx"));
+const Settings = lazy(() => import("./pages/admin/Settings.jsx"));
+
 
 export default function App() {
   return (
@@ -139,6 +153,21 @@ export default function App() {
             <Route path="allocations" element={<Allocations />} />
             <Route path ="student/:id" element={<StudentProfile/>}/>
             </Route>
+
+            {/* =========================
+              System administration routes
+          ========================= */}
+            <Route path="/admin" element={<ProtectedRoute allowedRole="ADMIN"><AdminLayout /></ProtectedRoute>}>
+            <Route index element={<Dashbord />} />
+            <Route path="users" element={<Users />} />
+            <Route path="users/create" element={<CreateUser />} />
+            <Route path="users/:id" element={<UserDetails />} />
+            <Route path="roles" element={<ManageRoles />} />
+            <Route path="student-affairs" element={<StudentAffairsAccounts />} />
+            <Route path="profile" element={<AdminProfile />} />
+            <Route path="settings" element={<Settings />} />
+            </Route>
+
         </Routes>
       </Suspense>
     </BrowserRouter>

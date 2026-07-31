@@ -41,3 +41,7 @@ export const updateAllocationStatus = (id, status) =>{
        `/allocations/status/${id}?status=${status}` 
     );
 };
+
+export const getMyRoomDetails = () => {
+    return api.get("/allocations/my-room")
+}

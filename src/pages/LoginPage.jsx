@@ -73,6 +73,9 @@ export default function LoginPage() {
         case "WARDEN":
           navigate("/warden");
           break;
+        case "MAINTENANCE":
+          navigate("/maintenance");
+          break;
         default:
           navigate("/");
       }

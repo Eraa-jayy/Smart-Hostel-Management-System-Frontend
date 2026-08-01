@@ -8,6 +8,7 @@ import {
   Bed,
   FileText,
   Bell,
+  MessageSquareWarning,
   LogOut,
 } from "lucide-react";
 
@@ -19,6 +20,7 @@ export default function Sidebar() {
     { name: "Upload Students", path: "/student-affairs/bulk-upload", icon: Upload },
     { name: "Hostels Management", path: "/student-affairs/hostel", icon: Building2 },
     { name: "Allocations", path: "/student-affairs/allocations", icon: Bed },
+    { name: "Complaint Status", path: "/student-affairs/complaints", icon: MessageSquareWarning },
     { name: "Reports", path: "/student-affairs/reports", icon: FileText },
     { name: "Notifications", path: "/student-affairs/notifications", icon: Bell },
   ];

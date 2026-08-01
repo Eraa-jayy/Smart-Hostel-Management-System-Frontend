@@ -1,3 +1,5 @@
+import api from "./axios";
+
 // Shared Complaint Service
 // This service is the single source of truth for complaints across
 // both the Student and Sub Warden modules. Data is persisted in localStorage.
@@ -168,14 +170,62 @@ export const declineComplaint = (complaintId, remarks = "") => {
   return updated;
 };
 
-export const resolveComplaint = (complaintId) => {
+export const resolveComplaint = (complaintId, maintenanceRemarks = "") => {
   const complaints = getAllComplaints();
   const updated = complaints.map((c) => {
     if (c.id === complaintId) {
-      return { ...c, status: "completed" };
+      return {
+        ...c,
+        status: "completed",
+        maintenanceRemarks: maintenanceRemarks || c.maintenanceRemarks || "Completed by maintenance.",
+        completedAt: new Date().toISOString(),
+      };
     }
     return c;
   });
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
   return updated;
+};
+
+// API-backed workflow used by the Sub Warden and Maintenance portals.
+// Keeping these separate preserves the demo data currently used by the student UI.
+const toPortalComplaint = (complaint) => ({
+  id: String(complaint.id),
+  title: complaint.title,
+  description: complaint.description,
+  category: complaint.category,
+  priority: "medium",
+  status: ({ PENDING: "pending", FORWARDED: "in_progress", IN_PROGRESS: "in_progress", RESOLVED: "completed", DECLINED: "rejected" })[complaint.status] || "pending",
+  studentName: complaint.studentName,
+  studentRegNo: complaint.studentIndexNumber,
+  roomNo: complaint.roomNumber,
+  date: complaint.createdAt ? complaint.createdAt.slice(0, 10) : "",
+  subWardenRemarks: complaint.subWardenRemarks || "",
+});
+
+export const getSubWardenComplaints = async () => {
+  try {
+    const { data } = await api.get("/complaints");
+    return data.length ? data.map(toPortalComplaint) : getAllComplaints();
+  } catch {
+    return getAllComplaints();
+  }
+};
+
+export const forwardComplaintToApi = async (complaintId, remarks = "") => {
+  try {
+    const { data } = await api.put(`/complaints/${complaintId}/forward`, null, { params: { remarks } });
+    return toPortalComplaint(data);
+  } catch {
+    return forwardComplaint(complaintId, remarks);
+  }
+};
+
+export const declineComplaintToApi = async (complaintId, remarks = "") => {
+  try {
+    const { data } = await api.put(`/complaints/${complaintId}/decline`, null, { params: { remarks } });
+    return toPortalComplaint(data);
+  } catch {
+    return declineComplaint(complaintId, remarks);
+  }
 };

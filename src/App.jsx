@@ -95,6 +95,7 @@ const Allocations = lazy(() =>
 const StudentProfile = lazy(()=>
 import("./pages/studentAffairs/StudentProfile.jsx")
 );
+const ComplaintStatus = lazy(() => import("./pages/studentAffairs/ComplaintStatus.jsx"));
 
 /* =========================
    SUB WARDEN MODULE
@@ -106,6 +107,13 @@ const StudentAllocation = lazy(() => import("./pages/SubWarden/StudentAllocation
 const InventoryManagement = lazy(() => import("./pages/SubWarden/InventoryManagement.jsx"));
 const SubWardenComplaints = lazy(() => import("./pages/SubWarden/Complaints.jsx"));
 const HostelConfig = lazy(() => import("./pages/SubWarden/HostelConfig.jsx"));
+
+/* =========================
+   MAINTENANCE MODULE
+========================= */
+const MaintenanceLayout = lazy(() => import("./layout/MaintenanceLayout.jsx"));
+const MaintenanceComplaints = lazy(() => import("./pages/Maintenance/Complaints.jsx"));
+const MaintenanceHistory = lazy(() => import("./pages/Maintenance/History.jsx"));
 
 /* =========================
    SYSTEM ADMIN MODULE
@@ -162,7 +170,14 @@ export default function App() {
             <Route path="building/:id" element={<BuildingDetails />} />
             <Route path="bulk-upload" element={<BulkUploadStudents />} />
             <Route path="allocations" element={<Allocations />} />
+            <Route path="complaints" element={<ComplaintStatus />} />
             <Route path ="student/:id" element={<StudentProfile/>}/>
+            </Route>
+
+            <Route path="/maintenance" element={<ProtectedRoute allowedRole="MAINTENANCE"><MaintenanceLayout /></ProtectedRoute>}>
+              <Route index element={<MaintenanceComplaints />} />
+              <Route path="complaints" element={<MaintenanceComplaints />} />
+              <Route path="history" element={<MaintenanceHistory />} />
             </Route>
 
             {/* =========================

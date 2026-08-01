@@ -13,9 +13,9 @@ import {
   MessageSquare,
 } from "lucide-react";
 import {
-  getAllComplaints,
-  forwardComplaint,
-  declineComplaint,
+  getSubWardenComplaints,
+  forwardComplaintToApi,
+  declineComplaintToApi,
 } from "../../service/complaintService";
 
 const STATUS_CONFIG = {
@@ -48,8 +48,12 @@ export default function Complaints() {
     loadData();
   }, []);
 
-  const loadData = () => {
-    setComplaints(getAllComplaints());
+  const loadData = async () => {
+    try {
+      setComplaints(await getSubWardenComplaints());
+    } catch (error) {
+      console.error("Unable to load complaints", error);
+    }
   };
 
   const handleForward = (id) => {
@@ -62,15 +66,15 @@ export default function Complaints() {
     setRemarks("");
   };
 
-  const confirmAction = () => {
+  const confirmAction = async () => {
     if (!remarksModal) return;
 
     if (remarksModal.action === "forward") {
-      forwardComplaint(remarksModal.id, remarks);
-      loadData();
+      await forwardComplaintToApi(remarksModal.id, remarks);
+      await loadData();
     } else if (remarksModal.action === "decline") {
-      declineComplaint(remarksModal.id, remarks);
-      loadData();
+      await declineComplaintToApi(remarksModal.id, remarks);
+      await loadData();
     }
     setRemarksModal(null);
     setRemarks("");

@@ -76,6 +76,9 @@ export default function LoginPage() {
         case "MAINTENANCE":
           navigate("/maintenance");
           break;
+        case "CANTEEN":
+          navigate("/canteen");
+          break;
         default:
           navigate("/");
       }

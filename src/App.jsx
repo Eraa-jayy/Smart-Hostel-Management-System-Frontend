@@ -64,6 +64,8 @@ const Payments = lazy(() =>
 const Notifications = lazy(() =>
   import("./pages/Student/Notifications.jsx")
 );
+const CanteenLayout = lazy(() => import("./layout/CanteenLayout.jsx"));
+const MealManagement = lazy(() => import("./pages/Canteen/MealManagement.jsx"));
  const ChangePassword = lazy (()=>
 import("./pages/ChangePassword.jsx")
 );
@@ -154,6 +156,10 @@ export default function App() {
             <Route path="canteen" element={<Canteen />} />
             <Route path="payments" element={<Payments />} />
             <Route path="notifications" element={<Notifications />} />
+          </Route>
+
+          <Route path="/canteen" element={<ProtectedRoute allowedRole="CANTEEN"><CanteenLayout /></ProtectedRoute>}>
+            <Route index element={<MealManagement />} />
           </Route>
 
           {/* =========================

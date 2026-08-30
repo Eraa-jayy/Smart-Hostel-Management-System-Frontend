@@ -130,7 +130,7 @@ const StudentAffairsDashboard = () => {
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
-            Student Affairs Dashboard
+            Dashboard
           </h1>
           <p className="text-sm text-gray-400 mt-0.5">
             Manage university hostels and student allocations
@@ -238,7 +238,7 @@ const StudentAffairsDashboard = () => {
       </div>
 
       {/* Hostel Cards */}
-      <h2 className="text-sm font-semibold text-gray-800">
+      <h2 className="text-l font-semibold text-gray-800">
         University Hostels
       </h2>
 

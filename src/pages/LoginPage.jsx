@@ -104,10 +104,10 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#1e2a78] via-[#2f3f9e] to-[#8f9be0] px-4">
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-[560px] px-10 py-10">
         <div className="flex justify-center mb-6">
-          <div className="bg-amber-200 px-5 py-2 rounded-full flex gap-2">
-            <UserCircle2 size={18} />
-            <span>{role.label} Login</span>
-          </div>
+           <div className="bg-amber-200 px-5 py-2 rounded-full flex gap-2">
+  <UserCircle2 size={18} />
+  <span>Login</span>
+</div> 
         </div>
 
         <div className="flex justify-center items-center gap-3 mb-6">
@@ -122,16 +122,16 @@ export default function LoginPage() {
           Login to access your dashboard
         </p>
 
-        <label className="text-sm">Login as</label>
+        {/* <label className="text-sm">Login as</label> */}
 
         <div className="relative mb-5">
-          <button
+          {/* <button
             className="w-full flex justify-between bg-slate-50 border rounded-xl px-4 py-3"
             onClick={() => setRoleOpen(!roleOpen)}
           >
             {role.label}
             <ChevronDown size={18} />
-          </button>
+          </button> */}
 
           {roleOpen && (
             <div className="absolute w-full bg-white border rounded-xl z-20">
@@ -192,10 +192,10 @@ export default function LoginPage() {
 
         <hr className="my-6" />
 
-        <div className="text-center text-sm">
+        {/* <div className="text-center text-sm">
           <ArrowLeft size={16} className="inline" />
           Back to Register
-        </div>
+        </div> */}
       </div>
     </div>
   );

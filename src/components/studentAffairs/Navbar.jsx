@@ -1,60 +1,119 @@
-import React from "react";
-import { Bell, UserCircle, Search } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { LogOut, ChevronDown, UserCircle } from "lucide-react";
 
-export default function Navbar() {
+// Helper function to handle literal "null" strings stored in localStorage
+const getCleanStorageItem = (key, fallback) => {
+  const item = localStorage.getItem(key);
+  if (!item || item === "null" || item === "undefined" || item.trim() === "") {
+    return fallback;
+  }
+  return item;
+};
+
+export default function Navbar({ onOpenProfile, profileImage }) {
+  const navigate = useNavigate();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const fullName = getCleanStorageItem("fullName", "Student Affairs");
+  const email = getCleanStorageItem("username", "Student Affairs");
+
+  const handleLogout = () => {
+    localStorage.clear();
+    setIsProfileOpen(false);
+    navigate("/login");
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsProfileOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
-    <header className="h-[68px] bg-white border-b border-gray-200/80 flex items-center justify-between px-6 lg:px-8">
-      {/* Left — Greeting */}
+    <header className="flex h-[68px] items-center justify-between border-b border-gray-200/80 bg-white px-4 sm:px-6 lg:px-8">
       <div className="min-w-0">
-        <h2 className="text-lg font-semibold text-gray-800">
-          Student Affairs <span className="text-blue-600">Dashboard</span>
-        </h2>
-        <p className="text-xs text-gray-400 -mt-0.5">
-          Manage university hostels and student allocations
-        </p>
+        <h1 className="truncate text-xl font-bold text-gray-800 sm:text-2xl lg:text-3xl">
+          Student Affairs <span className="text-blue-600" />
+        </h1>
       </div>
 
-      {/* Right — Actions */}
       <div className="flex items-center gap-2">
-        {/* Search */}
-        <button
-          type="button"
-          aria-label="Search"
-          className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-100/80 hover:bg-gray-200/80 text-gray-400 hover:text-gray-600 transition-colors text-sm"
-        >
-          <Search size={16} />
-          <span className="text-xs text-gray-400">Search...</span>
-          <kbd className="ml-2 text-[10px] font-medium bg-white border border-gray-200 rounded px-1.5 py-0.5 text-gray-400">
-            ⌘K
-          </kbd>
-        </button>
+        <div className="mx-1 hidden h-8 w-px bg-gray-200 sm:block" />
 
-        {/* Notifications */}
-        <button
-          type="button"
-          aria-label="Notifications"
-          className="relative w-9 h-9 flex items-center justify-center rounded-xl text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
-        >
-          <Bell size={18} />
-          <span className="absolute top-1.5 right-1.5 w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-sm shadow-red-500/30">
-            3
-          </span>
-        </button>
+        <div className="relative" ref={dropdownRef}>
+          <button
+            type="button"
+            onClick={() => setIsProfileOpen((prev) => !prev)}
+            className="flex items-center gap-2.5 rounded-xl py-1.5 pl-1.5 pr-3 text-left transition-colors hover:bg-gray-50"
+          >
+            <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-xs font-bold text-white shadow-md shadow-blue-500/20">
+              {profileImage ? (
+                <img
+                  src={profileImage}
+                  alt="Profile"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                "S"
+              )}
+            </div>
 
-        {/* Divider */}
-        <div className="w-px h-8 bg-gray-200 mx-1" />
+            <div className="hidden sm:block">
+              <p className="text-sm font-semibold text-gray-800 leading-tight">
+                {fullName}
+              </p>
+            </div>
 
-        {/* Profile */}
-        <div className="flex items-center gap-2.5 rounded-xl hover:bg-gray-50 py-1.5 pl-1.5 pr-3 transition-colors cursor-pointer">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shadow-md shadow-blue-500/20">
-            SA
-          </div>
-          <div className="hidden sm:block text-left">
-            <p className="text-sm font-semibold text-gray-800 leading-tight">
-              Student Affairs
-            </p>
-            <p className="text-[11px] text-gray-400 leading-tight">Admin</p>
-          </div>
+            <ChevronDown
+              size={14}
+              className={`text-gray-400 transition-transform duration-200 ${
+                isProfileOpen ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+
+          {isProfileOpen && (
+            <div className="absolute right-0 z-50 mt-2 w-52 rounded-xl border border-gray-100 bg-white py-1.5 shadow-lg duration-100 animate-in fade-in zoom-in-95">
+              <div className="border-b border-gray-100 px-4 py-2">
+                <p className="text-sm font-semibold text-gray-800">
+                  {fullName}
+                </p>
+                <p className="truncate text-[11px] text-gray-400">
+                  {email}
+                </p>
+              </div>
+
+              <div className="py-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsProfileOpen(false);
+                    onOpenProfile?.();
+                  }}
+                  className="flex w-full items-center gap-2 px-4 py-2 text-left text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                >
+                  <UserCircle size={15} />
+                  Profile
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="flex w-full items-center gap-2 px-4 py-2 text-left text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
+                >
+                  <LogOut size={15} />
+                  Log out
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </header>

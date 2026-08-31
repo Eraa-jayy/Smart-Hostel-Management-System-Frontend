@@ -267,7 +267,7 @@ export default function StudentAllocation() {
                 <button
                   key={roomNo}
                   onClick={() => handleOpenRoomDetails(roomNo)}
-                  className={`bg-white border rounded-2xl p-4.5 text-left transition hover:shadow-md group relative flex flex-col justify-between h-28 ${
+                  className={`bg-white border rounded-2xl p-5 text-left transition hover:shadow-md group relative flex flex-col justify-between h-36 ${
                     isFull
                       ? "border-red-100 hover:border-red-300 bg-red-50/5"
                       : isEmpty
@@ -289,7 +289,7 @@ export default function StudentAllocation() {
                         }
                       />
                     </div>
-                    <h3 className="text-lg font-extrabold text-gray-900 mt-1">{roomNo}</h3>
+                    <h3 className="mt-1 text-xl font-extrabold text-gray-900">{roomNo}</h3>
                   </div>
 
                   {/* Bed occupancy dots */}
@@ -300,7 +300,7 @@ export default function StudentAllocation() {
                         return (
                           <div
                             key={i}
-                            className={`w-2.5 h-2.5 rounded-full border ${
+                            className={`h-3 w-3 rounded-full border ${
                               isBedOccupied
                                 ? "bg-indigo-600 border-indigo-600"
                                 : "bg-transparent border-gray-300"

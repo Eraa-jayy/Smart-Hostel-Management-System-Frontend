@@ -30,56 +30,54 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-[260px] min-h-screen bg-[#0a0f1e] flex flex-col flex-shrink-0">
-      {/* Brand */}
-      <div className="px-6 pt-7 pb-6">
+    <aside className="sticky top-0 z-30 flex h-auto w-full flex-shrink-0 self-start flex-col overflow-hidden border-b border-white/5 bg-[#0a0f1e] shadow-2xl shadow-slate-950/30 lg:h-screen lg:w-[260px] lg:border-b-0 lg:border-r">
+      <div className="px-4 pb-4 pt-5 sm:px-6 sm:pb-6 sm:pt-7">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/25">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/25">
             <Building size={20} className="text-white" />
           </div>
           <div>
-            <h1 className="text-base font-bold text-white tracking-tight">UniNest</h1>
-            <p className="text-[11px] text-slate-500 font-medium">Sub Warden Portal</p>
+            <h1 className="text-base font-bold tracking-tight text-white">UniNest</h1>
+            <p className="text-[11px] font-medium text-slate-500">Sub Warden Portal</p>
           </div>
         </div>
       </div>
 
-      {/* Divider */}
-      <div className="mx-5 h-px bg-white/5" />
+      <div className="mx-4 h-px bg-white/5 sm:mx-5" />
 
-      {/* Section label */}
-      <p className="px-6 pt-5 pb-2 text-[10px] font-semibold uppercase tracking-widest text-slate-600">
-        Main Options
+      <p className="px-4 pb-2 pt-4 text-[10px] font-semibold uppercase tracking-widest text-white/60 sm:px-6 sm:pt-5">
+        Main Menu
       </p>
 
-      {/* Navigation */}
-      <nav className="flex-1 px-3 space-y-0.5">
+      <nav className="flex-1 space-y-1 overflow-x-auto px-3 py-1 lg:overflow-y-auto">
         {menus.map(({ name, path, icon: Icon }) => (
           <NavLink
             key={path}
             to={path}
             className={({ isActive }) =>
-              `group flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-200 ${
+              `group flex min-h-[46px] w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200 ${
                 isActive
-                  ? "bg-indigo-500/10 text-indigo-400 shadow-sm shadow-indigo-500/5"
-                  : "text-slate-400 hover:bg-white/5 hover:text-slate-200"
+                  ? "bg-blue-500/10 text-blue-400 shadow-sm shadow-blue-500/5"
+                  : "text-white hover:bg-white/5 hover:text-white"
               }`
             }
           >
             {({ isActive }) => (
               <>
                 <div
-                  className={`flex items-center justify-center w-8 h-8 rounded-lg transition-colors duration-200 ${
+                  className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg transition-colors duration-200 ${
                     isActive
-                      ? "bg-indigo-500/15 text-indigo-400"
-                      : "bg-white/5 text-slate-500 group-hover:bg-white/10 group-hover:text-slate-300"
+                      ? "bg-blue-500/15 text-blue-400"
+                      : "bg-white/5 text-white group-hover:bg-white/10 group-hover:text-white"
                   }`}
                 >
                   <Icon size={17} strokeWidth={2} />
                 </div>
-                {name}
+
+                <span className="min-w-0 flex-1 truncate text-left">{name}</span>
+
                 {isActive && (
-                  <div className="ml-auto w-1.5 h-1.5 rounded-full bg-indigo-400 shadow-sm shadow-indigo-400/50" />
+                  <div className="ml-auto h-1.5 w-1.5 flex-shrink-0 rounded-full bg-blue-400 shadow-sm shadow-blue-400/50" />
                 )}
               </>
             )}
@@ -87,21 +85,18 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      {/* Bottom section */}
-      <div className="px-3 pb-3 space-y-0.5">
-        {/* Divider */}
+      <div className="space-y-0.5 px-3 pb-3 pt-1">
         <div className="my-3 h-px bg-white/5" />
 
-        {/* Logout */}
         <button
           type="button"
           onClick={handleLogout}
-          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-[13px] font-medium text-red-400/80 hover:bg-red-500/10 hover:text-red-400 transition-all duration-200"
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium text-white transition-all duration-200 hover:bg-red-500/10 hover:text-red-400"
         >
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-red-500/10 text-red-400/60">
+          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-red-500/10 text-white">
             <LogOut size={17} strokeWidth={2} />
           </div>
-          LOGOUT
+          <span className="truncate">LOGOUT</span>
         </button>
       </div>
     </aside>

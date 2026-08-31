@@ -25,18 +25,11 @@ const STATUS_CONFIG = {
   rejected: { label: "Declined", icon: XCircle, color: "bg-red-50 text-red-700 border-red-200", dot: "bg-red-500" },
 };
 
-const PRIORITY_CONFIG = {
-  high: "bg-red-50 text-red-700 border-red-100",
-  medium: "bg-amber-50 text-amber-700 border-amber-100",
-  low: "bg-emerald-50 text-emerald-700 border-emerald-100",
-};
-
 export default function Complaints() {
   const [complaints, setComplaints] = useState([]);
 
   // Filters
   const [activeTab, setActiveTab] = useState("all");
-  const [priorityFilter, setPriorityFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -90,7 +83,6 @@ export default function Complaints() {
   // Filter complaints
   const filteredComplaints = complaints.filter((c) => {
     const matchesTab = activeTab === "all" || c.status === activeTab;
-    const matchesPriority = priorityFilter === "all" || c.priority === priorityFilter;
     const matchesCategory = categoryFilter === "all" || c.category === categoryFilter;
     const matchesSearch =
       (c.studentName || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -98,7 +90,7 @@ export default function Complaints() {
       (c.title || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
       (c.description || "").toLowerCase().includes(searchTerm.toLowerCase());
 
-    return matchesTab && matchesPriority && matchesCategory && matchesSearch;
+    return matchesTab && matchesCategory && matchesSearch;
   });
 
   // Extract categories dynamically
@@ -172,26 +164,17 @@ export default function Complaints() {
       {/* Filter and search parameters */}
       <div className="bg-white rounded-2xl border border-gray-150 p-4 flex flex-wrap gap-3">
         <div className="relative flex-1 min-w-[200px]">
-          <input
-            type="text"
-            placeholder="Search by student, room, title, or details..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-8.5 pr-3 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-          />
-          <Search size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-        </div>
-
-        <select
-          value={priorityFilter}
-          onChange={(e) => setPriorityFilter(e.target.value)}
-          className="px-3 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-        >
-          <option value="all">All Priorities</option>
-          <option value="high">High Priority</option>
-          <option value="medium">Medium Priority</option>
-          <option value="low">Low Priority</option>
-        </select>
+  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+    <Search size={14} className="text-gray-400" />
+  </div>
+  <input
+    type="text"
+    placeholder="Search by student, room, title, or details..."
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+    className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-9 pr-3 text-xs text-gray-800 placeholder-gray-400 transition-colors focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+  />
+</div>
 
         <select
           value={categoryFilter}
@@ -231,11 +214,6 @@ export default function Complaints() {
                       <StatusIcon size={10} />
                       {config.label}
                     </span>
-                    {comp.priority && (
-                      <span className={`inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase ${PRIORITY_CONFIG[comp.priority] || ""}`}>
-                        {comp.priority}
-                      </span>
-                    )}
                     <span className="text-[10px] text-gray-400 font-medium">Category: {comp.category}</span>
                   </div>
 

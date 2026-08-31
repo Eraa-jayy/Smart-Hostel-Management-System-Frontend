@@ -123,9 +123,9 @@ export default function Dashboard() {
       {/* Welcome Card */}
       <div className="relative bg-gradient-to-r from-indigo-900 to-indigo-700 rounded-3xl p-6 md:p-8 text-white overflow-hidden shadow-xl shadow-indigo-950/20">
         <div className="relative z-10 max-w-xl">
-          <span className="bg-indigo-500/30 text-indigo-200 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
+          {/* <span className="bg-indigo-500/30 text-indigo-200 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
             Smart Hostel Administration
-          </span>
+          </span> */}
           <h1 className="text-2xl md:text-3xl font-extrabold mt-3 tracking-tight">
             Welcome back, Sub Warden!
           </h1>

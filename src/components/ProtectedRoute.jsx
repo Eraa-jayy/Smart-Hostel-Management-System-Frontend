@@ -9,10 +9,14 @@ export default function ProtectedRoute({ children, allowedRole }) {
     return <Navigate to="/login" replace />;
   }
 
+  // Normalize role matching (e.g. SUB_WARDEN vs SUBWARDEN)
+  const normRole = role ? role.replace(/_/g, "").toUpperCase() : "";
+  const normAllowed = allowedRole ? allowedRole.replace(/_/g, "").toUpperCase() : "";
+
   // Role mismatch nam login page ekata yanna
-  if (allowedRole && role !== allowedRole) {
+  if (allowedRole && normRole !== normAllowed) {
     return <Navigate to="/login" replace />;
   }
 
   return children;
-}
+}

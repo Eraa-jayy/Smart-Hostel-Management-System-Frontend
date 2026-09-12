@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FileWarning,
   Send,
@@ -13,7 +13,13 @@ import {
   ChevronDown,
   CalendarDays,
   Tag,
+  RefreshCw,
+  Wrench,
 } from "lucide-react";
+import {
+  getAllComplaints,
+  submitComplaint,
+} from "../../service/complaintService";
 
 const CATEGORIES = [
   "Electrical",
@@ -31,50 +37,11 @@ const PRIORITIES = [
   { value: "high", label: "High", color: "bg-red-50 text-red-600 border-red-200 ring-red-100" },
 ];
 
-const COMPLAINTS = [
-  {
-    id: "#1042",
-    title: "Broken Chair",
-    category: "Furniture",
-    priority: "low",
-    status: "pending",
-    date: "Jul 12, 2026",
-    description: "The chair near the study desk has a broken leg and wobbles.",
-  },
-  {
-    id: "#1038",
-    title: "Water Leakage from Ceiling",
-    category: "Plumbing",
-    priority: "high",
-    status: "in_progress",
-    date: "Jul 10, 2026",
-    description: "Water is leaking from the ceiling near the window during rain.",
-  },
-  {
-    id: "#1035",
-    title: "Fan Not Working",
-    category: "Electrical",
-    priority: "medium",
-    status: "completed",
-    date: "Jul 8, 2026",
-    description: "The ceiling fan makes a loud noise and stops intermittently.",
-  },
-  {
-    id: "#1030",
-    title: "Wi-Fi Dropping Frequently",
-    category: "Internet / Wi-Fi",
-    priority: "medium",
-    status: "in_progress",
-    date: "Jul 5, 2026",
-    description: "Wi-Fi disconnects every 15-20 minutes in room A-204.",
-  },
-];
-
 const STATUS_CONFIG = {
   pending: { label: "Pending", icon: Clock, color: "bg-amber-50 text-amber-600", dot: "bg-amber-400" },
-  in_progress: { label: "In Progress", icon: AlertCircle, color: "bg-blue-50 text-blue-600", dot: "bg-blue-400" },
+  in_progress: { label: "Forwarded", icon: Wrench, color: "bg-blue-50 text-blue-600", dot: "bg-blue-400" },
   completed: { label: "Resolved", icon: CheckCircle2, color: "bg-emerald-50 text-emerald-600", dot: "bg-emerald-400" },
-  rejected: { label: "Rejected", icon: XCircle, color: "bg-red-50 text-red-600", dot: "bg-red-400" },
+  rejected: { label: "Declined", icon: XCircle, color: "bg-red-50 text-red-600", dot: "bg-red-400" },
 };
 
 const PRIORITY_CONFIG = {
@@ -84,21 +51,70 @@ const PRIORITY_CONFIG = {
 };
 
 export default function Complaints() {
+  const [complaints, setComplaints] = useState([]);
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
   const [priority, setPriority] = useState("");
   const [description, setDescription] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [submitting, setSubmitting] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
+
+  useEffect(() => {
+    loadComplaints();
+  }, []);
+
+  const loadComplaints = () => {
+    const data = getAllComplaints();
+    setComplaints(data);
+  };
+
+  const handleSubmit = () => {
+    if (!title.trim() || !category || !description.trim()) {
+      alert("Please fill in the Title, Category, and Description fields.");
+      return;
+    }
+
+    setSubmitting(true);
+
+    // Get logged-in student info from localStorage
+    const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+
+    const newComplaint = submitComplaint({
+      title: title.trim(),
+      category,
+      priority: priority || "medium",
+      description: description.trim(),
+      studentName: storedUser.fullName || storedUser.name || "Current Student",
+      studentRegNo: storedUser.registrationNumber || storedUser.username || "",
+      roomNo: storedUser.roomNo || "",
+    });
+
+    // Clear form
+    setTitle("");
+    setCategory("");
+    setPriority("");
+    setDescription("");
+    setSubmitting(false);
+
+    // Refresh
+    loadComplaints();
+
+    // Success feedback
+    setSuccessMsg(`Complaint "${newComplaint.title}" submitted successfully!`);
+    setTimeout(() => setSuccessMsg(""), 4000);
+  };
 
   const filtered = filterStatus === "all"
-    ? COMPLAINTS
-    : COMPLAINTS.filter((c) => c.status === filterStatus);
+    ? complaints
+    : complaints.filter((c) => c.status === filterStatus);
 
   const stats = {
-    total: COMPLAINTS.length,
-    pending: COMPLAINTS.filter((c) => c.status === "pending").length,
-    inProgress: COMPLAINTS.filter((c) => c.status === "in_progress").length,
-    resolved: COMPLAINTS.filter((c) => c.status === "completed").length,
+    total: complaints.length,
+    pending: complaints.filter((c) => c.status === "pending").length,
+    inProgress: complaints.filter((c) => c.status === "in_progress").length,
+    resolved: complaints.filter((c) => c.status === "completed").length,
+    declined: complaints.filter((c) => c.status === "rejected").length,
   };
 
   return (
@@ -111,15 +127,31 @@ export default function Complaints() {
             Submit and track your maintenance requests
           </p>
         </div>
+        <button
+          onClick={loadComplaints}
+          className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
+        >
+          <RefreshCw size={13} />
+          Refresh
+        </button>
       </div>
 
+      {/* ── Success Banner ── */}
+      {successMsg && (
+        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl px-4 py-3 flex items-center gap-2 text-sm text-emerald-700 font-medium animate-pulse">
+          <CheckCircle2 size={16} />
+          {successMsg}
+        </div>
+      )}
+
       {/* ── Stats Row ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
         {[
-          { label: "Total", value: stats.total, color: "from-gray-500 to-gray-600", bg: "bg-gray-50", iconColor: "text-gray-600", icon: FileWarning },
-          { label: "Pending", value: stats.pending, color: "from-amber-500 to-orange-500", bg: "bg-amber-50", iconColor: "text-amber-600", icon: Clock },
-          { label: "In Progress", value: stats.inProgress, color: "from-blue-500 to-blue-600", bg: "bg-blue-50", iconColor: "text-blue-600", icon: AlertCircle },
-          { label: "Resolved", value: stats.resolved, color: "from-emerald-500 to-emerald-600", bg: "bg-emerald-50", iconColor: "text-emerald-600", icon: CheckCircle2 },
+          { label: "Total", value: stats.total, bg: "bg-gray-50", iconColor: "text-gray-600", icon: FileWarning },
+          { label: "Pending", value: stats.pending, bg: "bg-amber-50", iconColor: "text-amber-600", icon: Clock },
+          { label: "Forwarded", value: stats.inProgress, bg: "bg-blue-50", iconColor: "text-blue-600", icon: Wrench },
+          { label: "Resolved", value: stats.resolved, bg: "bg-emerald-50", iconColor: "text-emerald-600", icon: CheckCircle2 },
+          { label: "Declined", value: stats.declined, bg: "bg-red-50", iconColor: "text-red-600", icon: XCircle },
         ].map(({ label, value, bg, iconColor, icon: Icon }) => (
           <div key={label} className="bg-white rounded-2xl border border-gray-100 p-4 hover:shadow-md transition-all duration-200">
             <div className="flex items-center gap-3">
@@ -149,7 +181,7 @@ export default function Complaints() {
           <div className="space-y-4">
             {/* Title */}
             <div>
-              <label className="block text-[12px] font-medium text-gray-500 mb-1.5">Title</label>
+              <label className="block text-[12px] font-medium text-gray-500 mb-1.5">Title <span className="text-red-400">*</span></label>
               <input
                 type="text"
                 value={title}
@@ -161,7 +193,7 @@ export default function Complaints() {
 
             {/* Category */}
             <div>
-              <label className="block text-[12px] font-medium text-gray-500 mb-1.5">Category</label>
+              <label className="block text-[12px] font-medium text-gray-500 mb-1.5">Category <span className="text-red-400">*</span></label>
               <div className="relative">
                 <select
                   value={category}
@@ -200,7 +232,7 @@ export default function Complaints() {
 
             {/* Description */}
             <div>
-              <label className="block text-[12px] font-medium text-gray-500 mb-1.5">Description</label>
+              <label className="block text-[12px] font-medium text-gray-500 mb-1.5">Description <span className="text-red-400">*</span></label>
               <textarea
                 rows="4"
                 value={description}
@@ -222,10 +254,12 @@ export default function Complaints() {
               </button>
               <button
                 type="button"
-                className="flex items-center justify-center gap-2 flex-1 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 shadow-sm shadow-blue-500/25 transition-all"
+                onClick={handleSubmit}
+                disabled={submitting}
+                className="flex items-center justify-center gap-2 flex-1 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 shadow-sm shadow-blue-500/25 transition-all disabled:opacity-50"
               >
                 <Send size={14} />
-                Submit
+                {submitting ? "Submitting..." : "Submit"}
               </button>
             </div>
           </div>
@@ -243,8 +277,9 @@ export default function Complaints() {
               {[
                 { value: "all", label: "All" },
                 { value: "pending", label: "Pending" },
-                { value: "in_progress", label: "In Progress" },
+                { value: "in_progress", label: "Forwarded" },
                 { value: "completed", label: "Resolved" },
+                { value: "rejected", label: "Declined" },
               ].map(({ value, label }) => (
                 <button
                   key={value}
@@ -264,7 +299,7 @@ export default function Complaints() {
 
           {/* Complaint cards */}
           {filtered.map((complaint) => {
-            const st = STATUS_CONFIG[complaint.status];
+            const st = STATUS_CONFIG[complaint.status] || STATUS_CONFIG.pending;
             const StatusIcon = st.icon;
             return (
               <div
@@ -280,6 +315,14 @@ export default function Complaints() {
                         <span className="text-[10px] font-mono text-gray-300">{complaint.id}</span>
                       </div>
                       <p className="text-[12px] text-gray-400 mt-1 leading-relaxed">{complaint.description}</p>
+
+                      {/* Sub Warden remarks (shown when available) */}
+                      {complaint.subWardenRemarks && complaint.status !== "pending" && (
+                        <div className="mt-2 px-3 py-2 bg-indigo-50/50 border border-indigo-100 rounded-lg">
+                          <p className="text-[11px] font-semibold text-indigo-600">Sub Warden Remarks:</p>
+                          <p className="text-[11px] text-indigo-500 mt-0.5">{complaint.subWardenRemarks}</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <span className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full flex-shrink-0 ${st.color}`}>
@@ -289,9 +332,11 @@ export default function Complaints() {
                 </div>
 
                 <div className="flex items-center gap-3 mt-4 pt-3 border-t border-gray-50">
-                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${PRIORITY_CONFIG[complaint.priority]}`}>
-                    {complaint.priority.charAt(0).toUpperCase() + complaint.priority.slice(1)}
-                  </span>
+                  {complaint.priority && (
+                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${PRIORITY_CONFIG[complaint.priority] || ""}`}>
+                      {complaint.priority.charAt(0).toUpperCase() + complaint.priority.slice(1)}
+                    </span>
+                  )}
                   <span className="flex items-center gap-1 text-[11px] text-gray-400">
                     <Tag size={10} />
                     {complaint.category}
@@ -300,6 +345,11 @@ export default function Complaints() {
                     <CalendarDays size={10} />
                     {complaint.date}
                   </span>
+                  {complaint.roomNo && (
+                    <span className="text-[11px] text-gray-400">
+                      Room {complaint.roomNo}
+                    </span>
+                  )}
                 </div>
               </div>
             );

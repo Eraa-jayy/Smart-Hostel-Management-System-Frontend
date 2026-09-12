@@ -64,6 +64,8 @@ const Payments = lazy(() =>
 const Notifications = lazy(() =>
   import("./pages/Student/Notifications.jsx")
 );
+const CanteenLayout = lazy(() => import("./layout/CanteenLayout.jsx"));
+const MealManagement = lazy(() => import("./pages/Canteen/MealManagement.jsx"));
  const ChangePassword = lazy (()=>
 import("./pages/ChangePassword.jsx")
 );
@@ -95,6 +97,25 @@ const Allocations = lazy(() =>
 const StudentProfile = lazy(()=>
 import("./pages/studentAffairs/StudentProfile.jsx")
 );
+const ComplaintStatus = lazy(() => import("./pages/studentAffairs/ComplaintStatus.jsx"));
+
+/* =========================
+   SUB WARDEN MODULE
+========================= */
+
+const SubWardenLayout = lazy(() => import("./layout/SubWardenLayout.jsx"));
+const SubWardenDashboard = lazy(() => import("./pages/SubWarden/Dashboard.jsx"));
+const StudentAllocation = lazy(() => import("./pages/SubWarden/StudentAllocation.jsx"));
+const InventoryManagement = lazy(() => import("./pages/SubWarden/InventoryManagement.jsx"));
+const SubWardenComplaints = lazy(() => import("./pages/SubWarden/Complaints.jsx"));
+const HostelConfig = lazy(() => import("./pages/SubWarden/HostelConfig.jsx"));
+
+/* =========================
+   MAINTENANCE MODULE
+========================= */
+const MaintenanceLayout = lazy(() => import("./layout/MaintenanceLayout.jsx"));
+const MaintenanceComplaints = lazy(() => import("./pages/Maintenance/Complaints.jsx"));
+const MaintenanceHistory = lazy(() => import("./pages/Maintenance/History.jsx"));
 
 /* =========================
    SYSTEM ADMIN MODULE
@@ -137,6 +158,10 @@ export default function App() {
             <Route path="notifications" element={<Notifications />} />
           </Route>
 
+          <Route path="/canteen" element={<ProtectedRoute allowedRole="CANTEEN"><CanteenLayout /></ProtectedRoute>}>
+            <Route index element={<MealManagement />} />
+          </Route>
+
           {/* =========================
               STUDENT AFFAIRS ROUTES
           ========================= */}
@@ -151,7 +176,26 @@ export default function App() {
             <Route path="building/:id" element={<BuildingDetails />} />
             <Route path="bulk-upload" element={<BulkUploadStudents />} />
             <Route path="allocations" element={<Allocations />} />
+            <Route path="complaints" element={<ComplaintStatus />} />
             <Route path ="student/:id" element={<StudentProfile/>}/>
+            </Route>
+
+            <Route path="/maintenance" element={<ProtectedRoute allowedRole="MAINTENANCE"><MaintenanceLayout /></ProtectedRoute>}>
+              <Route index element={<MaintenanceComplaints />} />
+              <Route path="complaints" element={<MaintenanceComplaints />} />
+              <Route path="history" element={<MaintenanceHistory />} />
+            </Route>
+
+            {/* =========================
+               SUB WARDEN ROUTES
+            ========================= */}
+            <Route path="/subwarden" element={<ProtectedRoute allowedRole="SUB_WARDEN"><SubWardenLayout /></ProtectedRoute>}>
+              <Route index element={<SubWardenDashboard />} />
+              <Route path="dashboard" element={<SubWardenDashboard />} />
+              <Route path="allocations" element={<StudentAllocation />} />
+              <Route path="inventory" element={<InventoryManagement />} />
+              <Route path="complaints" element={<SubWardenComplaints />} />
+              <Route path="config" element={<HostelConfig />} />
             </Route>
 
             {/* =========================

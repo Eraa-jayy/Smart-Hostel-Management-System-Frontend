@@ -51,6 +51,12 @@ export default function ChangePassword() {
         case "WARDEN":
           navigate("/warden");
           break;
+        case "MAINTENANCE":
+          navigate("/maintenance/complaints");
+          break;
+        case "CANTEEN":
+          navigate("/canteen");
+          break;
         default:
           navigate("/");
       }

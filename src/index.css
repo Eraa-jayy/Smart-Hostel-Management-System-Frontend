@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --un-primary: #212880;
+  --un-accent: #BDA664;
+}
+
 html {
   scroll-behavior: smooth;
 }
+
+body { color: #212880; background: #ffffff; }
+
+.bg-\[\#0a0f1e\] { background-color: var(--un-primary) !important; }
+.bg-\[\#f0f2f5\] { background-color: #F4F5FF !important; }
+.bg-\[\#101c5c\], .bg-\[\#000080\], .bg-\[\#00008B\] { background-color: var(--un-primary) !important; }
+.text-\[\#101c5c\], .text-\[\#000080\], .text-\[\#00008B\] { color: var(--un-primary) !important; }
+.bg-\[\#d4af37\] { background-color: var(--un-accent) !important; }
+.text-\[\#d4af37\] { color: var(--un-accent) !important; }

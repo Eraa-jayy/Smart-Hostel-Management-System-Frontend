@@ -1,0 +1,1 @@
+import{d as a}from"./index-Dfz_f7rm.js";const s=()=>a.get("/canteen-meals"),c=e=>a.post("/canteen-meals",e),l=(e,t)=>a.put(`/canteen-meals/${e}`,t),o=e=>a.delete(`/canteen-meals/${e}`);export{c,o as d,s as g,l as u};

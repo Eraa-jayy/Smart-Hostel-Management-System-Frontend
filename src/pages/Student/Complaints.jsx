@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   FileWarning,
   Send,
   RotateCcw,
   Clock,
-  AlertCircle,
   CheckCircle2,
   XCircle,
-  Search,
   Filter,
   MessageSquareWarning,
   ChevronDown,
@@ -15,9 +13,12 @@ import {
   Tag,
   RefreshCw,
   Wrench,
+  ImagePlus,
+  X,
+  ZoomIn,
 } from "lucide-react";
 import {
-  getAllComplaints,
+  getMyComplaints,
   submitComplaint,
 } from "../../service/complaintService";
 
@@ -31,78 +32,137 @@ const CATEGORIES = [
   "Other",
 ];
 
-const PRIORITIES = [
-  { value: "low", label: "Low", color: "bg-emerald-50 text-emerald-600 border-emerald-200 ring-emerald-100" },
-  { value: "medium", label: "Medium", color: "bg-amber-50 text-amber-600 border-amber-200 ring-amber-100" },
-  { value: "high", label: "High", color: "bg-red-50 text-red-600 border-red-200 ring-red-100" },
-];
-
 const STATUS_CONFIG = {
-  pending: { label: "Pending", icon: Clock, color: "bg-amber-50 text-amber-600", dot: "bg-amber-400" },
-  in_progress: { label: "Forwarded", icon: Wrench, color: "bg-blue-50 text-blue-600", dot: "bg-blue-400" },
-  completed: { label: "Resolved", icon: CheckCircle2, color: "bg-emerald-50 text-emerald-600", dot: "bg-emerald-400" },
-  rejected: { label: "Declined", icon: XCircle, color: "bg-red-50 text-red-600", dot: "bg-red-400" },
-};
-
-const PRIORITY_CONFIG = {
-  low: "bg-emerald-50 text-emerald-600",
-  medium: "bg-amber-50 text-amber-600",
-  high: "bg-red-50 text-red-600",
+  PENDING: { label: "Pending", icon: Clock, color: "bg-amber-50 text-amber-600", dot: "bg-amber-400" },
+  FORWARDED: { label: "Forwarded", icon: Wrench, color: "bg-blue-50 text-blue-600", dot: "bg-blue-400" },
+  IN_PROGRESS: { label: "In Progress", icon: Wrench, color: "bg-indigo-50 text-indigo-600", dot: "bg-indigo-400" },
+  RESOLVED: { label: "Resolved", icon: CheckCircle2, color: "bg-emerald-50 text-emerald-600", dot: "bg-emerald-400" },
+  DECLINED: { label: "Declined", icon: XCircle, color: "bg-red-50 text-red-600", dot: "bg-red-400" },
 };
 
 export default function Complaints() {
   const [complaints, setComplaints] = useState([]);
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
-  const [priority, setPriority] = useState("");
   const [description, setDescription] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [submitting, setSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+
+  // Photo upload state
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState("");
+  const [dragActive, setDragActive] = useState(false);
+  const fileInputRef = useRef(null);
+
+  // Lightbox state
+  const [lightboxUrl, setLightboxUrl] = useState(null);
 
   useEffect(() => {
     loadComplaints();
   }, []);
 
-  const loadComplaints = () => {
-    const data = getAllComplaints();
-    setComplaints(data);
+  const loadComplaints = async () => {
+    try {
+      const data = await getMyComplaints();
+      setComplaints(data);
+    } catch (err) {
+      console.error(err);
+      setErrorMsg("Failed to load complaints.");
+    }
   };
 
-  const handleSubmit = () => {
+  // Photo handlers
+  const handleFileSelect = (file) => {
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+    if (!allowedTypes.includes(file.type)) {
+      alert("Please select an image file (JPEG, PNG, or WebP).");
+      return;
+    }
+
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert("File size must be less than 5 MB.");
+      return;
+    }
+
+    setPhotoFile(file);
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => setPhotoPreview(reader.result);
+    reader.readAsDataURL(file);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFileSelect(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+  };
+
+  const removePhoto = () => {
+    setPhotoFile(null);
+    setPhotoPreview("");
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleSubmit = async () => {
     if (!title.trim() || !category || !description.trim()) {
-      alert("Please fill in the Title, Category, and Description fields.");
+      setErrorMsg("Please fill in all required fields: Title, Category, and Description.");
       return;
     }
 
     setSubmitting(true);
+    setErrorMsg("");
 
-    // Get logged-in student info from localStorage
-    const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+    try {
+      const newComplaint = await submitComplaint({
+        title: title.trim(),
+        category,
+        description: description.trim(),
+      }, photoFile);
 
-    const newComplaint = submitComplaint({
-      title: title.trim(),
-      category,
-      priority: priority || "medium",
-      description: description.trim(),
-      studentName: storedUser.fullName || storedUser.name || "Current Student",
-      studentRegNo: storedUser.registrationNumber || storedUser.username || "",
-      roomNo: storedUser.roomNo || "",
-    });
+      // Clear form
+      setTitle("");
+      setCategory("");
+      setDescription("");
+      removePhoto();
+      
+      // Refresh complaints list
+      await loadComplaints();
 
-    // Clear form
-    setTitle("");
-    setCategory("");
-    setPriority("");
-    setDescription("");
-    setSubmitting(false);
-
-    // Refresh
-    loadComplaints();
-
-    // Success feedback
-    setSuccessMsg(`Complaint "${newComplaint.title}" submitted successfully!`);
-    setTimeout(() => setSuccessMsg(""), 4000);
+      // Success feedback
+      setSuccessMsg(`Complaint "${newComplaint.title}" submitted successfully!`);
+      setTimeout(() => setSuccessMsg(""), 4000);
+    } catch (err) {
+      console.error("Complaint submission error:", err);
+      const serverMsg =
+        err.response?.data?.detail ||
+        err.response?.data?.message ||
+        (typeof err.response?.data === "string" ? err.response.data : null);
+      setErrorMsg(serverMsg || "Failed to submit complaint. Make sure you have an active room allocation.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const filtered = filterStatus === "all"
@@ -111,10 +171,10 @@ export default function Complaints() {
 
   const stats = {
     total: complaints.length,
-    pending: complaints.filter((c) => c.status === "pending").length,
-    inProgress: complaints.filter((c) => c.status === "in_progress").length,
-    resolved: complaints.filter((c) => c.status === "completed").length,
-    declined: complaints.filter((c) => c.status === "rejected").length,
+    pending: complaints.filter((c) => c.status === "PENDING").length,
+    inProgress: complaints.filter((c) => c.status === "FORWARDED" || c.status === "IN_PROGRESS").length,
+    resolved: complaints.filter((c) => c.status === "RESOLVED").length,
+    declined: complaints.filter((c) => c.status === "DECLINED").length,
   };
 
   return (
@@ -136,11 +196,17 @@ export default function Complaints() {
         </button>
       </div>
 
-      {/* ── Success Banner ── */}
+      {/* ── Banners ── */}
       {successMsg && (
         <div className="bg-emerald-50 border border-emerald-200 rounded-2xl px-4 py-3 flex items-center gap-2 text-sm text-emerald-700 font-medium animate-pulse">
           <CheckCircle2 size={16} />
           {successMsg}
+        </div>
+      )}
+      {errorMsg && (
+        <div className="bg-red-50 border border-red-200 rounded-2xl px-4 py-3 flex items-center gap-2 text-sm text-red-700 font-medium">
+          <XCircle size={16} />
+          {errorMsg}
         </div>
       )}
 
@@ -149,7 +215,7 @@ export default function Complaints() {
         {[
           { label: "Total", value: stats.total, bg: "bg-gray-50", iconColor: "text-gray-600", icon: FileWarning },
           { label: "Pending", value: stats.pending, bg: "bg-amber-50", iconColor: "text-amber-600", icon: Clock },
-          { label: "Forwarded", value: stats.inProgress, bg: "bg-blue-50", iconColor: "text-blue-600", icon: Wrench },
+          { label: "In Progress", value: stats.inProgress, bg: "bg-blue-50", iconColor: "text-blue-600", icon: Wrench },
           { label: "Resolved", value: stats.resolved, bg: "bg-emerald-50", iconColor: "text-emerald-600", icon: CheckCircle2 },
           { label: "Declined", value: stats.declined, bg: "bg-red-50", iconColor: "text-red-600", icon: XCircle },
         ].map(({ label, value, bg, iconColor, icon: Icon }) => (
@@ -209,26 +275,7 @@ export default function Complaints() {
               </div>
             </div>
 
-            {/* Priority */}
-            <div>
-              <label className="block text-[12px] font-medium text-gray-500 mb-2">Priority</label>
-              <div className="flex gap-2.5">
-                {PRIORITIES.map(({ value, label, color }) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => setPriority(value)}
-                    className={`flex-1 py-2 text-xs font-semibold rounded-xl border-2 transition-all duration-200 ${
-                      priority === value
-                        ? color + " ring-2"
-                        : "bg-gray-50 text-gray-400 border-gray-200 hover:border-gray-300"
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </div>
+
 
             {/* Description */}
             <div>
@@ -242,11 +289,85 @@ export default function Complaints() {
               />
             </div>
 
+            {/* Photo Upload */}
+            <div>
+              <label className="block text-[12px] font-medium text-gray-500 mb-1.5">
+                Incident Photo <span className="text-gray-300">(optional)</span>
+              </label>
+
+              {!photoPreview ? (
+                <div
+                  onDrop={handleDrop}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`relative flex flex-col items-center justify-center gap-2 px-4 py-6 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-200 ${
+                    dragActive
+                      ? "border-blue-400 bg-blue-50/50 scale-[1.01]"
+                      : "border-gray-200 bg-gray-50 hover:border-blue-300 hover:bg-blue-50/30"
+                  }`}
+                >
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
+                    dragActive ? "bg-blue-100" : "bg-gray-100"
+                  }`}>
+                    <ImagePlus size={18} className={dragActive ? "text-blue-500" : "text-gray-400"} />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-xs font-medium text-gray-500">
+                      {dragActive ? "Drop your image here" : "Drag & drop or click to upload"}
+                    </p>
+                    <p className="text-[10px] text-gray-300 mt-0.5">
+                      JPEG, PNG, WebP · Max 5 MB
+                    </p>
+                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={(e) => handleFileSelect(e.target.files?.[0])}
+                    className="hidden"
+                  />
+                </div>
+              ) : (
+                <div className="relative group rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
+                  <img
+                    src={photoPreview}
+                    alt="Incident preview"
+                    className="w-full h-40 object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+                    <button
+                      type="button"
+                      onClick={() => setLightboxUrl(photoPreview)}
+                      className="p-2 bg-white/90 rounded-lg hover:bg-white transition-colors shadow-sm"
+                    >
+                      <ZoomIn size={16} className="text-gray-700" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={removePhoto}
+                      className="p-2 bg-white/90 rounded-lg hover:bg-red-50 transition-colors shadow-sm"
+                    >
+                      <X size={16} className="text-red-500" />
+                    </button>
+                  </div>
+                  <div className="px-3 py-2 flex items-center justify-between">
+                    <p className="text-[11px] text-gray-500 truncate">
+                      {photoFile?.name}
+                    </p>
+                    <p className="text-[10px] text-gray-400 flex-shrink-0 ml-2">
+                      {photoFile && (photoFile.size / 1024).toFixed(0)} KB
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Actions */}
             <div className="flex gap-3 pt-1">
               <button
                 type="button"
-                onClick={() => { setTitle(""); setCategory(""); setPriority(""); setDescription(""); }}
+                onClick={() => { setTitle(""); setCategory(""); setDescription(""); removePhoto(); }}
                 className="flex items-center justify-center gap-2 flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
               >
                 <RotateCcw size={14} />
@@ -254,12 +375,22 @@ export default function Complaints() {
               </button>
               <button
                 type="button"
+                id="submit-complaint-btn"
                 onClick={handleSubmit}
                 disabled={submitting}
-                className="flex items-center justify-center gap-2 flex-1 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 shadow-sm shadow-blue-500/25 transition-all disabled:opacity-50"
+                className="flex items-center justify-center gap-2 flex-1 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 shadow-sm shadow-blue-500/25 transition-all disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
               >
-                <Send size={14} />
-                {submitting ? "Submitting..." : "Submit"}
+                {submitting ? (
+                  <>
+                    <RefreshCw size={14} className="animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    <Send size={14} />
+                    Submit
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -276,10 +407,11 @@ export default function Complaints() {
             <div className="flex flex-wrap gap-2">
               {[
                 { value: "all", label: "All" },
-                { value: "pending", label: "Pending" },
-                { value: "in_progress", label: "Forwarded" },
-                { value: "completed", label: "Resolved" },
-                { value: "rejected", label: "Declined" },
+                { value: "PENDING", label: "Pending" },
+                { value: "FORWARDED", label: "Forwarded" },
+                { value: "IN_PROGRESS", label: "In Progress" },
+                { value: "RESOLVED", label: "Resolved" },
+                { value: "DECLINED", label: "Declined" },
               ].map(({ value, label }) => (
                 <button
                   key={value}
@@ -299,8 +431,14 @@ export default function Complaints() {
 
           {/* Complaint cards */}
           {filtered.map((complaint) => {
-            const st = STATUS_CONFIG[complaint.status] || STATUS_CONFIG.pending;
+            const st = STATUS_CONFIG[complaint.status] || STATUS_CONFIG.PENDING;
             const StatusIcon = st.icon;
+            
+            // Generate full photo URL if needed
+            const displayPhotoUrl = complaint.photoUrl 
+              ? (complaint.photoUrl.startsWith('http') ? complaint.photoUrl : `http://localhost:8080${complaint.photoUrl}`) 
+              : null;
+
             return (
               <div
                 key={complaint.id}
@@ -312,15 +450,41 @@ export default function Complaints() {
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <h3 className="text-[14px] font-semibold text-gray-800">{complaint.title}</h3>
-                        <span className="text-[10px] font-mono text-gray-300">{complaint.id}</span>
+                        <span className="text-[10px] font-mono text-gray-300">#{complaint.id}</span>
                       </div>
                       <p className="text-[12px] text-gray-400 mt-1 leading-relaxed">{complaint.description}</p>
 
-                      {/* Sub Warden remarks (shown when available) */}
-                      {complaint.subWardenRemarks && complaint.status !== "pending" && (
+                      {/* Incident Photo */}
+                      {displayPhotoUrl && (
+                        <div
+                          className="mt-2.5 relative group cursor-pointer rounded-lg overflow-hidden border border-gray-100 w-fit"
+                          onClick={() => setLightboxUrl(displayPhotoUrl)}
+                        >
+                          <img
+                            src={displayPhotoUrl}
+                            alt="Incident photo"
+                            className="h-28 w-auto max-w-full object-cover rounded-lg"
+                          />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                            <div className="p-1.5 bg-white/90 rounded-lg shadow-sm">
+                              <ZoomIn size={14} className="text-gray-700" />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Remarks (shown when available) */}
+                      {complaint.subWardenRemarks && (
                         <div className="mt-2 px-3 py-2 bg-indigo-50/50 border border-indigo-100 rounded-lg">
                           <p className="text-[11px] font-semibold text-indigo-600">Sub Warden Remarks:</p>
                           <p className="text-[11px] text-indigo-500 mt-0.5">{complaint.subWardenRemarks}</p>
+                        </div>
+                      )}
+                      
+                      {complaint.maintenanceRemarks && (
+                        <div className="mt-2 px-3 py-2 bg-emerald-50/50 border border-emerald-100 rounded-lg">
+                          <p className="text-[11px] font-semibold text-emerald-600">Maintenance Remarks:</p>
+                          <p className="text-[11px] text-emerald-500 mt-0.5">{complaint.maintenanceRemarks}</p>
                         </div>
                       )}
                     </div>
@@ -332,22 +496,17 @@ export default function Complaints() {
                 </div>
 
                 <div className="flex items-center gap-3 mt-4 pt-3 border-t border-gray-50">
-                  {complaint.priority && (
-                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${PRIORITY_CONFIG[complaint.priority] || ""}`}>
-                      {complaint.priority.charAt(0).toUpperCase() + complaint.priority.slice(1)}
-                    </span>
-                  )}
                   <span className="flex items-center gap-1 text-[11px] text-gray-400">
                     <Tag size={10} />
                     {complaint.category}
                   </span>
                   <span className="flex items-center gap-1 text-[11px] text-gray-400">
                     <CalendarDays size={10} />
-                    {complaint.date}
+                    {complaint.createdAt ? new Date(complaint.createdAt).toLocaleDateString() : ""}
                   </span>
-                  {complaint.roomNo && (
+                  {complaint.roomNumber && (
                     <span className="text-[11px] text-gray-400">
-                      Room {complaint.roomNo}
+                      {complaint.hostelName} · Room {complaint.roomNumber}
                     </span>
                   )}
                 </div>
@@ -365,6 +524,28 @@ export default function Complaints() {
           )}
         </div>
       </div>
+
+      {/* ── Lightbox Modal ── */}
+      {lightboxUrl && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+          onClick={() => setLightboxUrl(null)}
+        >
+          <div className="relative max-w-3xl max-h-[85vh] w-full" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setLightboxUrl(null)}
+              className="absolute -top-3 -right-3 z-10 p-2 bg-white rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+            >
+              <X size={18} className="text-gray-700" />
+            </button>
+            <img
+              src={lightboxUrl}
+              alt="Incident photo (full size)"
+              className="w-full h-auto max-h-[85vh] object-contain rounded-2xl shadow-2xl"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

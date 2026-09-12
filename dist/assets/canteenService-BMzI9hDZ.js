@@ -1,0 +1,1 @@
+import{d as a}from"./index-CU9MKXWG.js";const s=e=>a.get("/canteen-meals"),l=()=>a.get("/canteen-meals/my-hostel"),c=e=>a.post("/canteen-meals",e),o=(e,t)=>a.put(`/canteen-meals/${e}`,t),m=e=>a.delete(`/canteen-meals/${e}`);export{s as a,c,m as d,l as g,o as u};

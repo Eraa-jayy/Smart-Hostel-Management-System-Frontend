@@ -1,15 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserPlus, ArrowLeft, CalendarDays } from "lucide-react";
 import { createUser } from "../../service/adminService.js";
+import { getAllHostels } from "../../service/hostelService.js";
 
 const ROLES = [
   "ADMIN",
   "STUDENT_AFFAIRS",
   "WARDEN",
   "SUBWARDEN",
+  "MAINTENANCE",
+  "CANTEEN",
   "STUDENT",
 ];
+
+const STAFF_ROLES = ["WARDEN", "SUBWARDEN", "MAINTENANCE", "CANTEEN"];
 
 export default function CreateUser() {
   const navigate = useNavigate();
@@ -18,9 +23,24 @@ export default function CreateUser() {
     username: "",
     password: "",
     role: "STUDENT_AFFAIRS",
+    hostelId: "",
   });
+  const [hostels, setHostels] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    loadHostels();
+  }, []);
+
+  const loadHostels = async () => {
+    try {
+      const res = await getAllHostels();
+      setHostels(res.data || []);
+    } catch (err) {
+      console.error("Failed to load hostels list", err);
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -38,7 +58,15 @@ export default function CreateUser() {
     setLoading(true);
 
     try {
-      await createUser(formData);
+      const payload = {
+        username: formData.username,
+        password: formData.password,
+        role: formData.role,
+        ...(STAFF_ROLES.includes(formData.role) && formData.hostelId
+          ? { hostelId: Number(formData.hostelId) }
+          : {}),
+      };
+      await createUser(payload);
       alert("User created successfully");
       navigate("/admin/users");
     } catch (err) {
@@ -123,6 +151,27 @@ export default function CreateUser() {
               ))}
             </select>
           </div>
+
+          {STAFF_ROLES.includes(formData.role) && (
+            <div>
+              <label className="text-sm font-semibold text-gray-600 mb-1 block">
+                Assigned Hostel
+              </label>
+              <select
+                name="hostelId"
+                value={formData.hostelId}
+                onChange={handleChange}
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-400"
+              >
+                <option value="">Select Hostel (Optional / Recommended)</option>
+                {hostels.map((h) => (
+                  <option key={h.id} value={h.id}>
+                    {h.hostelName} ({h.location || h.hostelType})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {error && <p className="text-red-500 text-sm">{error}</p>}
 

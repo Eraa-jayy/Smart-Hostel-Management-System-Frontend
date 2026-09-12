@@ -18,9 +18,9 @@ import {
   getInventory,
 } from "../../service/subWardenData";
 import {
-  getAllComplaints,
-  forwardComplaint,
-  declineComplaint,
+  getSubWardenComplaints,
+  forwardComplaintToApi,
+  declineComplaintToApi,
 } from "../../service/complaintService";
 
 export default function Dashboard() {
@@ -35,23 +35,37 @@ export default function Dashboard() {
     loadData();
   }, []);
 
-  const loadData = () => {
+  const loadData = async () => {
     setConfig(getHostelConfig());
     setAllocations(getAllocations());
     setInventory(getInventory());
-    setComplaints(getAllComplaints());
+    
+    try {
+      const data = await getSubWardenComplaints();
+      setComplaints(data);
+    } catch (e) {
+      console.error("Failed to load complaints for dashboard", e);
+    }
   };
 
-  const handleForward = (id) => {
-    forwardComplaint(id);
-    loadData();
+  const handleForward = async (id) => {
+    try {
+      await forwardComplaintToApi(id);
+      await loadData();
+    } catch (e) {
+      console.error("Failed to forward", e);
+    }
   };
 
-  const handleDecline = (id) => {
+  const handleDecline = async (id) => {
     const confirm = window.confirm("Are you sure you want to decline this complaint?");
     if (confirm) {
-      declineComplaint(id);
-      loadData();
+      try {
+        await declineComplaintToApi(id, "Declined from Dashboard");
+        await loadData();
+      } catch (e) {
+        console.error("Failed to decline", e);
+      }
     }
   };
 
@@ -95,9 +109,9 @@ export default function Dashboard() {
   });
 
   // Complaint stats
-  const pendingComplaints = complaints.filter((c) => c.status === "pending");
-  const inProgressComplaints = complaints.filter((c) => c.status === "in_progress");
-  const resolvedComplaints = complaints.filter((c) => c.status === "completed");
+  const pendingComplaints = complaints.filter((c) => c.status === "PENDING");
+  const inProgressComplaints = complaints.filter((c) => c.status === "FORWARDED" || c.status === "IN_PROGRESS");
+  const resolvedComplaints = complaints.filter((c) => c.status === "RESOLVED");
 
   // Floor-wise Occupancy calculations
   const floorOccupancy = [];
@@ -280,17 +294,6 @@ export default function Dashboard() {
                   >
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span
-                          className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase ${
-                            comp.priority === "high"
-                              ? "bg-red-100 text-red-700"
-                              : comp.priority === "medium"
-                              ? "bg-amber-100 text-amber-700"
-                              : "bg-emerald-100 text-emerald-700"
-                          }`}
-                        >
-                          {comp.priority}
-                        </span>
                         <h4 className="text-xs font-bold text-gray-800">{comp.title}</h4>
                       </div>
                       <p className="text-xs text-gray-400">

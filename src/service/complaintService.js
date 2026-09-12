@@ -227,6 +227,7 @@ export const declineComplaintToApi = async (complaintId, remarks = "") => {
     const { data } = await api.put(`/complaints/${complaintId}/decline`, null, { params: { remarks } });
     return toPortalComplaint(data);
   } catch {
-    return declineComplaint(complaintId, remarks);
+    const updated = declineComplaint(complaintId, remarks);
+    return updated.find((c) => c.id === complaintId) || null;
   }
 };

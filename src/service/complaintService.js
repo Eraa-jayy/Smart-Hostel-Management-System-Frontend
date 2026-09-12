@@ -217,7 +217,8 @@ export const forwardComplaintToApi = async (complaintId, remarks = "") => {
     const { data } = await api.put(`/complaints/${complaintId}/forward`, null, { params: { remarks } });
     return toPortalComplaint(data);
   } catch {
-    return forwardComplaint(complaintId, remarks);
+    const updated = forwardComplaint(complaintId, remarks);
+    return updated.find((c) => c.id === complaintId) || null;
   }
 };
 

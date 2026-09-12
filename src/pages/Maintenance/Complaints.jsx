@@ -3,7 +3,12 @@ import { CheckCircle2, Clock3, MapPin, RefreshCw, Wrench } from "lucide-react";
 import { completeMaintenanceComplaint, getMaintenanceQueue } from "../../service/maintenanceService";
 
 export default function Complaints() {
-  const [items, setItems] = useState([]), [loading, setLoading] = useState(true), [error, setError] = useState(""), [selected, setSelected] = useState(null), [note, setNote] = useState(""), [saving, setSaving] = useState(false);
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [selected, setSelected] = useState(null);
+  const [note, setNote] = useState("");
+  const [saving, setSaving] = useState(false);
   const load = async () => { setLoading(true); setError(""); try { setItems(await getMaintenanceQueue()); } catch { setError("Unable to load work orders. Check that the backend is running and you are signed in as maintenance staff."); } finally { setLoading(false); } };
   useEffect(() => { load(); }, []);
   const complete = async () => { if (!note.trim()) return; setSaving(true); try { await completeMaintenanceComplaint(selected.id, note.trim()); setSelected(null); setNote(""); await load(); } catch (e) { setError(e.response?.data?.message || "Could not complete this work order."); } finally { setSaving(false); } };

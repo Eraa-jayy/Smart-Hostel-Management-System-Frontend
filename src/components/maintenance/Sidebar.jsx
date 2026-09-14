@@ -26,11 +26,11 @@ export default function Sidebar() {
     <aside className="sticky top-0 z-30 flex h-screen w-[260px] flex-shrink-0 self-start flex-col overflow-hidden border-r border-white/5 bg-[#0a0f1e] shadow-2xl shadow-slate-950/30">
       <div className="px-6 pb-6 pt-7">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/25">
+          {/* <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/25">
             <Building2 size={20} className="text-white" />
-          </div>
+          </div> */}
           <div>
-            <h1 className="text-base font-bold tracking-tight text-white">UniNest</h1>
+            <h1 className="text-sm font-bold leading-snug tracking-tight text-white">Smart Hostel Management System</h1>
             <p className="text-[11px] font-medium text-slate-500">Maintenance Portal</p>
           </div>
         </div>

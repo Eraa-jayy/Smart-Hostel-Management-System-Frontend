@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { LogOut, ChevronDown, UserCircle } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 // Helper function to handle literal "null" strings stored in localStorage
 const getCleanStorageItem = (key, fallback) => {
@@ -87,7 +87,7 @@ export default function Navbar({ onOpenProfile, profileImage }) {
               </div>
 
               <div className="py-1">
-                <button
+                {/* <button
                   type="button"
                   onClick={() => {
                     setIsProfileOpen(false);
@@ -97,7 +97,7 @@ export default function Navbar({ onOpenProfile, profileImage }) {
                 >
                   <UserCircle size={15} />
                   Profile
-                </button>
+                </button> */}
 
                 <button
                   type="button"

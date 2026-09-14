@@ -96,6 +96,10 @@ const StudentProfile = lazy(()=>
 import("./pages/studentAffairs/StudentProfile.jsx")
 );
 
+const Announcements = lazy(() =>
+  import("./pages/studentAffairs/Announcements.jsx")
+);
+
 /* =========================
    SYSTEM ADMIN MODULE
 ========================= */
@@ -152,6 +156,7 @@ export default function App() {
             <Route path="bulk-upload" element={<BulkUploadStudents />} />
             <Route path="allocations" element={<Allocations />} />
             <Route path ="student/:id" element={<StudentProfile/>}/>
+           <Route path="Announcement" element={<Announcements />} />
             </Route>
 
             {/* =========================

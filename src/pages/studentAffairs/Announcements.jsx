@@ -25,6 +25,15 @@ const Announcement = () => {
   const [formCategory, setFormCategory] = useState("General");
   const [priority, setPriority] = useState("Normal");
 
+  const currentUsername = localStorage.getItem("username") || "";
+  const currentRole = localStorage.getItem("role") || "";
+
+  // STUDENT_AFFAIRS and ADMIN can manage any; others only their own
+  const canManage = (announcement) =>
+    currentRole === "STUDENT_AFFAIRS" ||
+    currentRole === "ADMIN" ||
+    announcement.createdBy === currentUsername;
+
 
   const fetchAnnouncements = async () => {
     try {
@@ -91,6 +100,8 @@ const Announcement = () => {
           message: description,
           targetType: "ALL",
           hostelId: null,
+          category: formCategory,
+          priority: priority,
         }
       );
 
@@ -149,6 +160,11 @@ const Announcement = () => {
       return;
     }
 
+    if (!canManage(editingAnnouncement)) {
+      alert("You can only edit your own announcements");
+      return;
+    }
+
     if (
       !editingAnnouncement.title ||
       !editingAnnouncement.message
@@ -168,6 +184,8 @@ const Announcement = () => {
             editingAnnouncement.targetType || "ALL",
           hostelId:
             editingAnnouncement.hostelId || null,
+          category: editingAnnouncement.category || "General",
+          priority: editingAnnouncement.priority || "Normal",
         }
       );
 
@@ -731,30 +749,34 @@ const Announcement = () => {
 
                     {/* Edit */}
 
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setEditingAnnouncement(
-                          announcement
-                        )
-                      }
-                      className="rounded-lg bg-blue-50 px-4 py-2 text-xs font-medium text-blue-600 hover:bg-blue-100"
-                    >
-                      Edit
-                    </button>
+                    {canManage(announcement) && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setEditingAnnouncement(
+                            announcement
+                          )
+                        }
+                        className="rounded-lg bg-blue-50 px-4 py-2 text-xs font-medium text-blue-600 hover:bg-blue-100"
+                      >
+                        Edit
+                      </button>
+                    )}
 
 
                     {/* DELETE */}
 
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleDelete(announcement.id)
-                      }
-                      className="rounded-lg bg-red-50 px-4 py-2 text-xs font-medium text-red-600 hover:bg-red-100"
-                    >
-                      Delete
-                    </button>
+                    {canManage(announcement) && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleDelete(announcement.id)
+                        }
+                        className="rounded-lg bg-red-50 px-4 py-2 text-xs font-medium text-red-600 hover:bg-red-100"
+                      >
+                        Delete
+                      </button>
+                    )}
 
                   </div>
 

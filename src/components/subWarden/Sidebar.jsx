@@ -7,6 +7,7 @@ import {
   AlertTriangle,
   Settings,
   Building,
+  Megaphone,
   LogOut,
 } from "lucide-react";
 
@@ -18,6 +19,7 @@ export default function Sidebar() {
     { name: "Student Allocation", path: "/subwarden/allocations", icon: Users },
     { name: "Inventory Management", path: "/subwarden/inventory", icon: ClipboardList },
     { name: "Complaints", path: "/subwarden/complaints", icon: AlertTriangle },
+    { name: "Announcements", path: "/subwarden/announcements", icon: Megaphone },
     { name: "Configuration", path: "/subwarden/config", icon: Settings },
   ];
 

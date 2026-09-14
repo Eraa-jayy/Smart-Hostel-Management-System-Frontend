@@ -76,13 +76,6 @@ export const getSubWardenComplaints = async () => {
 
 export const forwardComplaintToApi = async (complaintId, remarks = "") => {
   try {
-<<<<<<< Updated upstream
-    const { data } = await api.put(`/complaints/${complaintId}/forward`, null, { params: { remarks } });
-    return toPortalComplaint(data);
-  } catch {
-    const updated = forwardComplaint(complaintId, remarks);
-    return updated.find((c) => c.id === complaintId) || null;
-=======
     const { data } = await api.put(`/complaints/${complaintId}/forward`, null, {
       params: { remarks },
     });
@@ -90,19 +83,11 @@ export const forwardComplaintToApi = async (complaintId, remarks = "") => {
   } catch (error) {
     console.error("Failed to forward complaint", error);
     throw error;
->>>>>>> Stashed changes
   }
 };
 
 export const declineComplaintToApi = async (complaintId, remarks = "") => {
   try {
-<<<<<<< Updated upstream
-    const { data } = await api.put(`/complaints/${complaintId}/decline`, null, { params: { remarks } });
-    return toPortalComplaint(data);
-  } catch {
-    const updated = declineComplaint(complaintId, remarks);
-    return updated.find((c) => c.id === complaintId) || null;
-=======
     const { data } = await api.put(`/complaints/${complaintId}/decline`, null, {
       params: { remarks },
     });
@@ -110,7 +95,6 @@ export const declineComplaintToApi = async (complaintId, remarks = "") => {
   } catch (error) {
     console.error("Failed to decline complaint", error);
     throw error;
->>>>>>> Stashed changes
   }
 };
 

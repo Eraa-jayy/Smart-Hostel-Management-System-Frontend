@@ -182,7 +182,7 @@ export default function App() {
             <Route path="allocations" element={<Allocations />} />
             <Route path="complaints" element={<ComplaintStatus />} />
             <Route path ="student/:id" element={<StudentProfile/>}/>
-           <Route path="Announcement" element={<Announcements />} />
+           <Route path="announcements" element={<Announcements />} />
             </Route>
 
             <Route path="/maintenance" element={<ProtectedRoute allowedRole="MAINTENANCE"><MaintenanceLayout /></ProtectedRoute>}>
@@ -201,6 +201,7 @@ export default function App() {
               <Route path="inventory" element={<InventoryManagement />} />
               <Route path="complaints" element={<SubWardenComplaints />} />
               <Route path="config" element={<HostelConfig />} />
+              <Route path="announcements" element={<Announcements />} />
             </Route>
 
             {/* =========================

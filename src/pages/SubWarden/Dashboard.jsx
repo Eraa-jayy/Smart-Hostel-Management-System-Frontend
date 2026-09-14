@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import {
   getHostelConfig,
-  getAllocations,
   getInventory,
 } from "../../service/subWardenData";
 import {
@@ -22,6 +21,8 @@ import {
   forwardComplaintToApi,
   declineComplaintToApi,
 } from "../../service/complaintService";
+import { getMyStaffAssignment } from "../../service/staffAssignmentService";
+import { getSubWardenAllocations } from "../../service/studentAllocationService";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ export default function Dashboard() {
   const [allocations, setAllocations] = useState([]);
   const [inventory, setInventory] = useState({});
   const [complaints, setComplaints] = useState([]);
+  const [assignedHostel, setAssignedHostel] = useState("");
 
   useEffect(() => {
     loadData();
@@ -37,8 +39,17 @@ export default function Dashboard() {
 
   const loadData = async () => {
     setConfig(getHostelConfig());
-    setAllocations(getAllocations());
+    try {
+      const response = await getSubWardenAllocations();
+      setAllocations(response.data || []);
+    } catch (error) {
+      console.error("Failed to load assigned hostel students", error);
+      setAllocations([]);
+    }
     setInventory(getInventory());
+    getMyStaffAssignment()
+      .then((response) => setAssignedHostel(response.data?.hostelName || "Not assigned"))
+      .catch(() => setAssignedHostel("Not assigned"));
     
     try {
       const data = await getSubWardenComplaints();
@@ -80,7 +91,10 @@ export default function Dashboard() {
   // Calculate stats
   const totalRooms = config.floorsCount * config.roomsPerFloor;
   const maxCapacity = totalRooms * config.roomCapacity;
-  const currentOccupied = allocations.length;
+  const activeStudents = allocations.filter((allocation) => allocation.status === "ACTIVE");
+  const deactivatedStudents = allocations.filter((allocation) => allocation.status === "INACTIVE");
+  const removedStudents = allocations.filter((allocation) => allocation.status === "REMOVED");
+  const currentOccupied = activeStudents.length;
   const occupancyPercent = maxCapacity > 0 ? Math.round((currentOccupied / maxCapacity) * 100) : 0;
 
   // Inventory calculations
@@ -120,7 +134,7 @@ export default function Dashboard() {
     for (let r = 1; r <= config.roomsPerFloor; r++) {
       floorRooms.push(`${f}${r < 10 ? "0" + r : r}`);
     }
-    const floorAllocated = allocations.filter((a) => floorRooms.includes(a.roomNo)).length;
+    const floorAllocated = activeStudents.filter((a) => floorRooms.includes(a.roomNo || a.roomNumber)).length;
     const floorMaxCapacity = config.roomsPerFloor * config.roomCapacity;
     const floorPercent = Math.round((floorAllocated / floorMaxCapacity) * 100);
     floorOccupancy.push({
@@ -133,19 +147,23 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-5 sm:space-y-6">
       {/* Welcome Card */}
-      <div className="relative bg-gradient-to-r from-indigo-900 to-indigo-700 rounded-3xl p-6 md:p-8 text-white overflow-hidden shadow-xl shadow-indigo-950/20">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-900 to-indigo-700 p-5 text-white shadow-xl shadow-indigo-950/20 sm:p-6 md:p-8">
         <div className="relative z-10 max-w-xl">
           {/* <span className="bg-indigo-500/30 text-indigo-200 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
             Smart Hostel Administration
           </span> */}
-          <h1 className="text-2xl md:text-3xl font-extrabold mt-3 tracking-tight">
+          <h1 className="mt-1 text-xl font-extrabold tracking-tight sm:mt-3 sm:text-2xl md:text-3xl">
             Welcome back, Sub Warden!
           </h1>
           <p className="text-sm text-indigo-100/80 mt-2 leading-relaxed">
             Monitor and allocate students to their rooms, review inventory checklists, and process maintenance complaints. Currently managing Block A.
           </p>
+          <div className="mt-4 inline-flex items-center rounded-xl border border-white/15 bg-white/10 px-3.5 py-2 text-xs font-semibold text-indigo-100 backdrop-blur-md">
+            Assigned hostel:
+            <span className="ml-1.5 text-white">{assignedHostel || "Loading..."}</span>
+          </div>
         </div>
         {/* Background shapes */}
         <div className="absolute right-0 bottom-0 top-0 w-1/3 bg-gradient-to-l from-indigo-500/10 to-transparent pointer-events-none" />
@@ -153,14 +171,15 @@ export default function Dashboard() {
       </div>
 
       {/* KPI Cards Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 sm:gap-4">
         {/* Total Rooms */}
         <div className="bg-white rounded-2xl border border-gray-150 p-5 hover:shadow-lg hover:shadow-gray-200/50 hover:border-indigo-100 transition-all duration-300">
           <div className="flex items-center gap-3.5">
             <div className="bg-indigo-50 w-12 h-12 rounded-xl flex items-center justify-center text-indigo-600">
               <Building2 size={22} />
             </div>
-            <div>
+
+            <div className="min-w-0 flex-1">
               <p className="text-[11px] text-gray-400 font-semibold uppercase tracking-wider">Total Rooms</p>
               <h3 className="text-2xl font-bold text-gray-950 mt-0.5">{totalRooms}</h3>
               <p className="text-[11px] text-gray-400 mt-0.5">
@@ -176,7 +195,7 @@ export default function Dashboard() {
             <div className="bg-emerald-50 w-12 h-12 rounded-xl flex items-center justify-center text-emerald-600">
               <Users size={22} />
             </div>
-            <div>
+            <div className="min-w-0 flex-1">
               <p className="text-[11px] text-gray-400 font-semibold uppercase tracking-wider">Occupancy</p>
               <h3 className="text-2xl font-bold text-gray-950 mt-0.5">{occupancyPercent}%</h3>
               <p className="text-[11px] text-gray-500 font-medium mt-0.5">
@@ -216,6 +235,71 @@ export default function Dashboard() {
               </p>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 sm:gap-4">
+        {[
+          ["Total Students", allocations.length, "text-indigo-600", "bg-indigo-50"],
+          ["Active Students", activeStudents.length, "text-emerald-600", "bg-emerald-50"],
+          ["Deactive Students", deactivatedStudents.length, "text-amber-600", "bg-amber-50"],
+          ["Removed Students", removedStudents.length, "text-red-600", "bg-red-50"],
+        ].map(([label, value, textColor, background]) => (
+          <div key={label} className="flex min-w-0 items-center gap-3 rounded-2xl border border-gray-150 bg-white p-4 sm:p-5">
+            <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl ${background} ${textColor}`}>
+              <Users size={19} />
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-[11px] font-semibold uppercase tracking-wider text-gray-400">{label}</p>
+              <p className={`text-2xl font-bold ${textColor}`}>{value}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="rounded-2xl border border-gray-150 bg-white p-4 sm:p-5">
+        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-sm font-bold text-gray-800">Student Status Details</h2>
+            <p className="text-xs text-gray-400">Backend records for students assigned to this hostel</p>
+          </div>
+          <button
+            onClick={() => navigate("/subwarden/allocations")}
+            className="w-fit text-xs font-semibold text-indigo-600 hover:underline"
+          >
+            Manage students
+          </button>
+        </div>
+        <div className="space-y-2">
+          {allocations.length === 0 ? (
+            <p className="rounded-xl bg-gray-50 p-5 text-center text-xs text-gray-400">
+              No student records found for this hostel.
+            </p>
+          ) : (
+            allocations.map((student) => {
+              const statusStyles = {
+                ACTIVE: "bg-emerald-100 text-emerald-700",
+                INACTIVE: "bg-amber-100 text-amber-700",
+                REMOVED: "bg-red-100 text-red-700",
+              };
+              return (
+                <div
+                  key={student.id}
+                  className="flex flex-col gap-2 rounded-xl border border-gray-100 p-3 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-xs font-bold text-gray-800">{student.studentName}</p>
+                    <p className="text-[10px] text-gray-500">
+                      {student.registrationNumber} · Room {student.roomNumber || "Unassigned"}
+                    </p>
+                  </div>
+                  <span className={`w-fit rounded-full px-2 py-1 text-[10px] font-bold ${statusStyles[student.status] || "bg-gray-100 text-gray-600"}`}>
+                    {student.status === "INACTIVE" ? "DEACTIVATED" : student.status}
+                  </span>
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
 

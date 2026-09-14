@@ -11,7 +11,7 @@ export default function SubWardenLayout() {
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Navbar />
 
-        <main className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
+        <main className="min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-3 sm:p-6 lg:p-8">
           <Outlet />
         </main>
       </div>

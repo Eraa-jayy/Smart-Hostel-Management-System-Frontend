@@ -91,7 +91,7 @@ export default function Navbar({ onOpenProfile, profileImage }) {
               </div>
 
               <div className="py-1">
-                <button
+                {/* <button
                   type="button"
                   onClick={() => {
                     setIsProfileOpen(false);
@@ -101,7 +101,7 @@ export default function Navbar({ onOpenProfile, profileImage }) {
                 >
                   <UserCircle size={15} />
                   Profile
-                </button>
+                </button> */}
 
                 <button
                   type="button"

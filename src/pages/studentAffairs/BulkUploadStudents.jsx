@@ -114,8 +114,8 @@ export default function BulkUploadStudents() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!selectedFloor) {
-      alert("Please select a floor");
+    if (!selectedHostel || !selectedBuilding || !selectedFloor) {
+      alert("Please select a hostel, building, and floor");
       return;
     }
     if (!expectedReleaseDate) {
@@ -135,11 +135,14 @@ export default function BulkUploadStudents() {
     try {
       const response = await bulkUploadStudents(
         file,
+        selectedHostel,
+        selectedBuilding,
         selectedFloor,
         academicYear,
         expectedReleaseDate
       );
       setResult(response.data);
+      alert("Allocation submitted successfully.");
     } catch (error) {
       console.log(error);
       alert("Upload failed. Check console for details.");

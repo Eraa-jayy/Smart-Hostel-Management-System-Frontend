@@ -128,7 +128,6 @@ const Announcements = lazy(() =>
 
 const Dashbord = lazy(() => import("./pages/admin/DashBord.jsx"));
 const Users = lazy(() => import("./pages/admin/Users.jsx"));
-const CreateUser = lazy(() => import("./pages/admin/CreateUser.jsx"));
 const UserDetails = lazy(() => import("./pages/admin/UserDetails.jsx"));
 const ManageRoles = lazy(() => import("./pages/admin/ManageRoles.jsx"));
 const StudentAffairsAccounts = lazy(() => import("./pages/admin/StudentAffairsAccounts.jsx"));
@@ -209,7 +208,7 @@ export default function App() {
             <Route path="/admin" element={<ProtectedRoute allowedRole="ADMIN"><AdminLayout /></ProtectedRoute>}>
             <Route index element={<Dashbord />} />
             <Route path="users" element={<Users />} />
-            <Route path="users/create" element={<CreateUser />} />
+            <Route path="users/create" element={<Users />} />
             <Route path="users/:id" element={<UserDetails />} />
             <Route path="roles" element={<ManageRoles />} />
             <Route path="student-affairs" element={<StudentAffairsAccounts />} />

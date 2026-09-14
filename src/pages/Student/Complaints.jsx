@@ -16,6 +16,8 @@ import {
   ImagePlus,
   X,
   ZoomIn,
+  Sparkles,
+  MapPin,
 } from "lucide-react";
 import {
   getMyComplaints,
@@ -33,11 +35,11 @@ const CATEGORIES = [
 ];
 
 const STATUS_CONFIG = {
-  PENDING: { label: "Pending", icon: Clock, color: "bg-amber-50 text-amber-600", dot: "bg-amber-400" },
-  FORWARDED: { label: "Forwarded", icon: Wrench, color: "bg-blue-50 text-blue-600", dot: "bg-blue-400" },
-  IN_PROGRESS: { label: "In Progress", icon: Wrench, color: "bg-indigo-50 text-indigo-600", dot: "bg-indigo-400" },
-  RESOLVED: { label: "Resolved", icon: CheckCircle2, color: "bg-emerald-50 text-emerald-600", dot: "bg-emerald-400" },
-  DECLINED: { label: "Declined", icon: XCircle, color: "bg-red-50 text-red-600", dot: "bg-red-400" },
+  PENDING: { label: "Pending", icon: Clock, color: "bg-amber-50 text-amber-600 border-amber-200/60", dot: "bg-amber-400" },
+  FORWARDED: { label: "Forwarded", icon: Wrench, color: "bg-blue-50 text-blue-600 border-blue-200/60", dot: "bg-blue-400" },
+  IN_PROGRESS: { label: "In Progress", icon: Wrench, color: "bg-indigo-50 text-indigo-600 border-indigo-200/60", dot: "bg-indigo-400" },
+  RESOLVED: { label: "Resolved", icon: CheckCircle2, color: "bg-emerald-50 text-emerald-600 border-emerald-200/60", dot: "bg-emerald-400" },
+  DECLINED: { label: "Declined", icon: XCircle, color: "bg-rose-50 text-rose-600 border-rose-200/60", dot: "bg-rose-400" },
 };
 
 export default function Complaints() {
@@ -46,6 +48,7 @@ export default function Complaints() {
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -64,35 +67,33 @@ export default function Complaints() {
   }, []);
 
   const loadComplaints = async () => {
+    setLoading(true);
     try {
       const data = await getMyComplaints();
-      setComplaints(data);
+      setComplaints(data || []);
     } catch (err) {
       console.error(err);
       setErrorMsg("Failed to load complaints.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Photo handlers
   const handleFileSelect = (file) => {
     if (!file) return;
 
-    // Validate file type
     const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
     if (!allowedTypes.includes(file.type)) {
       alert("Please select an image file (JPEG, PNG, or WebP).");
       return;
     }
 
-    // Validate file size (5MB)
     if (file.size > 5 * 1024 * 1024) {
       alert("File size must be less than 5 MB.");
       return;
     }
 
     setPhotoFile(file);
-
-    // Create preview
     const reader = new FileReader();
     reader.onloadend = () => setPhotoPreview(reader.result);
     reader.readAsDataURL(file);
@@ -135,23 +136,23 @@ export default function Complaints() {
     setErrorMsg("");
 
     try {
-      const newComplaint = await submitComplaint({
-        title: title.trim(),
-        category,
-        description: description.trim(),
-      }, photoFile);
+      const newComplaint = await submitComplaint(
+        {
+          title: title.trim(),
+          category,
+          description: description.trim(),
+        },
+        photoFile
+      );
 
-      // Clear form
       setTitle("");
       setCategory("");
       setDescription("");
       removePhoto();
-      
-      // Refresh complaints list
+
       await loadComplaints();
 
-      // Success feedback
-      setSuccessMsg(`Complaint "${newComplaint.title}" submitted successfully!`);
+      setSuccessMsg(`Complaint "${newComplaint?.title || title}" submitted successfully!`);
       setTimeout(() => setSuccessMsg(""), 4000);
     } catch (err) {
       console.error("Complaint submission error:", err);
@@ -165,9 +166,10 @@ export default function Complaints() {
     }
   };
 
-  const filtered = filterStatus === "all"
-    ? complaints
-    : complaints.filter((c) => c.status === filterStatus);
+  const filtered =
+    filterStatus === "all"
+      ? complaints
+      : complaints.filter((c) => c.status === filterStatus);
 
   const stats = {
     total: complaints.length,
@@ -178,121 +180,144 @@ export default function Complaints() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* ── Page Header ── */}
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Complaints</h1>
-          <p className="text-sm text-gray-400 mt-0.5">
-            Submit and track your maintenance requests
-          </p>
+    <div className="space-y-6 pb-12">
+      {/* ── Page Header Banner ── */}
+      <div className="w-full">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-900 p-6 text-white shadow-2xl shadow-indigo-950/20 sm:p-8 lg:p-10">
+          <div className="relative z-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+            <div className="max-w-xl">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-400/30 bg-blue-500/20 px-3.5 py-1 text-xs font-semibold tracking-wide text-blue-200 backdrop-blur-md">
+                <Sparkles size={13} className="text-blue-300" />
+                Maintenance & Support
+              </span>
+
+              <h1 className="mt-3 text-2xl font-black tracking-tight text-white sm:text-3xl lg:text-4xl">
+                Hostel Complaints
+              </h1>
+
+              <p className="mt-2 text-sm leading-relaxed text-slate-300">
+                Lodge facility issues, track maintenance resolution progress, and access sub-warden feedback in real time.
+              </p>
+            </div>
+
+          </div>
+
+          {/* Background Lighting Effects */}
+          <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-20 right-20 h-56 w-56 rounded-full bg-indigo-500/25 blur-3xl" />
         </div>
-        <button
-          onClick={loadComplaints}
-          className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
-        >
-          <RefreshCw size={13} />
-          Refresh
-        </button>
       </div>
 
-      {/* ── Banners ── */}
+      {/* ── Feedback Banners ── */}
       {successMsg && (
-        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl px-4 py-3 flex items-center gap-2 text-sm text-emerald-700 font-medium animate-pulse">
-          <CheckCircle2 size={16} />
+        <div className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/90 px-4 py-3 text-xs font-bold text-emerald-700 shadow-sm backdrop-blur-md animate-in fade-in slide-in-from-top-2">
+          <CheckCircle2 size={18} className="text-emerald-600 flex-shrink-0" />
           {successMsg}
         </div>
       )}
       {errorMsg && (
-        <div className="bg-red-50 border border-red-200 rounded-2xl px-4 py-3 flex items-center gap-2 text-sm text-red-700 font-medium">
-          <XCircle size={16} />
+        <div className="flex items-center gap-3 rounded-2xl border border-rose-200 bg-rose-50/90 px-4 py-3 text-xs font-bold text-rose-700 shadow-sm backdrop-blur-md animate-in fade-in slide-in-from-top-2">
+          <XCircle size={18} className="text-rose-600 flex-shrink-0" />
           {errorMsg}
         </div>
       )}
 
-      {/* ── Stats Row ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+      {/* ── Interactive Metric Cards ── */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 sm:gap-4">
         {[
-          { label: "Total", value: stats.total, bg: "bg-gray-50", iconColor: "text-gray-600", icon: FileWarning },
-          { label: "Pending", value: stats.pending, bg: "bg-amber-50", iconColor: "text-amber-600", icon: Clock },
-          { label: "In Progress", value: stats.inProgress, bg: "bg-blue-50", iconColor: "text-blue-600", icon: Wrench },
-          { label: "Resolved", value: stats.resolved, bg: "bg-emerald-50", iconColor: "text-emerald-600", icon: CheckCircle2 },
-          { label: "Declined", value: stats.declined, bg: "bg-red-50", iconColor: "text-red-600", icon: XCircle },
-        ].map(({ label, value, bg, iconColor, icon: Icon }) => (
-          <div key={label} className="bg-white rounded-2xl border border-gray-100 p-4 hover:shadow-md transition-all duration-200">
+          { label: "Total Filed", value: stats.total, lightBg: "bg-slate-100 text-slate-700", icon: FileWarning },
+          { label: "Pending Review", value: stats.pending, lightBg: "bg-amber-50 text-amber-600", icon: Clock },
+          { label: "In Resolution", value: stats.inProgress, lightBg: "bg-blue-50 text-blue-600", icon: Wrench },
+          { label: "Resolved", value: stats.resolved, lightBg: "bg-emerald-50 text-emerald-600", icon: CheckCircle2 },
+          { label: "Declined", value: stats.declined, lightBg: "bg-rose-50 text-rose-600", icon: XCircle },
+        ].map(({ label, value, lightBg, icon: Icon }) => (
+          <div
+            key={label}
+            className="group relative overflow-hidden rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
+          >
             <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center`}>
-                <Icon size={18} className={iconColor} strokeWidth={2} />
+              <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${lightBg} transition-transform duration-300 group-hover:scale-110`}>
+                <Icon size={18} strokeWidth={2.2} />
               </div>
               <div>
-                <p className="text-xl font-bold text-gray-900">{value}</p>
-                <p className="text-[11px] text-gray-400">{label}</p>
+                <p className="text-xl font-black text-slate-900">{value}</p>
+                <p className="text-[11px] font-semibold text-slate-400">{label}</p>
               </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* ── Two Column Layout ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        {/* ── Submit Form (Left) ── */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-6 h-fit">
-          <div className="flex items-center gap-2.5 mb-5">
-            <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
-              <Send size={16} className="text-blue-600" />
+      {/* ── Main Layout (Form Left / Stream Right) ── */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
+        
+        {/* Submit Form (Left Span 2) */}
+        <div className="h-fit rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm lg:col-span-2">
+          <div className="mb-5 flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600">
+              <Send size={18} strokeWidth={2.2} />
             </div>
-            <h2 className="text-sm font-semibold text-gray-800">New Complaint</h2>
+            <div>
+              <h2 className="text-base font-bold text-slate-800">New Complaint</h2>
+              <p className="text-xs text-slate-400">Fill in details for quick action</p>
+            </div>
           </div>
 
           <div className="space-y-4">
-            {/* Title */}
+            {/* Title Input */}
             <div>
-              <label className="block text-[12px] font-medium text-gray-500 mb-1.5">Title <span className="text-red-400">*</span></label>
+              <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">
+                Title <span className="text-rose-500">*</span>
+              </label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. Broken ceiling fan"
-                className="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-gray-300"
+                placeholder="e.g. Broken ceiling fan in Room A-204"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs font-semibold text-slate-800 outline-none transition-all placeholder:font-normal placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-500/20"
               />
             </div>
 
-            {/* Category */}
+            {/* Category Select */}
             <div>
-              <label className="block text-[12px] font-medium text-gray-500 mb-1.5">Category <span className="text-red-400">*</span></label>
+              <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">
+                Category <span className="text-rose-500">*</span>
+              </label>
               <div className="relative">
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all appearance-none"
+                  className="w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs font-semibold text-slate-800 outline-none transition-all focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-500/20"
                 >
                   <option value="">Select category</option>
                   {CATEGORIES.map((c) => (
-                    <option key={c} value={c}>{c}</option>
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
                   ))}
                 </select>
-                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                <ChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
               </div>
             </div>
 
-
-
-            {/* Description */}
+            {/* Description Textarea */}
             <div>
-              <label className="block text-[12px] font-medium text-gray-500 mb-1.5">Description <span className="text-red-400">*</span></label>
+              <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">
+                Description <span className="text-rose-500">*</span>
+              </label>
               <textarea
                 rows="4"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Describe the issue in detail..."
-                className="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all resize-none placeholder:text-gray-300"
+                className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs font-medium text-slate-800 outline-none transition-all placeholder:font-normal placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-500/20"
               />
             </div>
 
-            {/* Photo Upload */}
+            {/* Photo Upload Box */}
             <div>
-              <label className="block text-[12px] font-medium text-gray-500 mb-1.5">
-                Incident Photo <span className="text-gray-300">(optional)</span>
+              <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">
+                Incident Photo <span className="font-normal text-slate-400">(Optional)</span>
               </label>
 
               {!photoPreview ? (
@@ -301,24 +326,22 @@ export default function Complaints() {
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onClick={() => fileInputRef.current?.click()}
-                  className={`relative flex flex-col items-center justify-center gap-2 px-4 py-6 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-200 ${
+                  className={`group relative flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed p-5 text-center transition-all duration-200 ${
                     dragActive
-                      ? "border-blue-400 bg-blue-50/50 scale-[1.01]"
-                      : "border-gray-200 bg-gray-50 hover:border-blue-300 hover:bg-blue-50/30"
+                      ? "border-indigo-500 bg-indigo-50/60 scale-[1.01]"
+                      : "border-slate-200 bg-slate-50/50 hover:border-indigo-400 hover:bg-indigo-50/20 cursor-pointer"
                   }`}
                 >
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
-                    dragActive ? "bg-blue-100" : "bg-gray-100"
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl transition-colors ${
+                    dragActive ? "bg-indigo-100 text-indigo-600" : "bg-white text-slate-400 shadow-sm group-hover:text-indigo-500"
                   }`}>
-                    <ImagePlus size={18} className={dragActive ? "text-blue-500" : "text-gray-400"} />
+                    <ImagePlus size={18} />
                   </div>
-                  <div className="text-center">
-                    <p className="text-xs font-medium text-gray-500">
-                      {dragActive ? "Drop your image here" : "Drag & drop or click to upload"}
+                  <div>
+                    <p className="text-xs font-bold text-slate-700">
+                      {dragActive ? "Drop image here" : "Drag & drop or click to upload"}
                     </p>
-                    <p className="text-[10px] text-gray-300 mt-0.5">
-                      JPEG, PNG, WebP · Max 5 MB
-                    </p>
+                    <p className="mt-0.5 text-[10px] text-slate-400">JPEG, PNG, WebP · Max 5 MB</p>
                   </div>
                   <input
                     ref={fileInputRef}
@@ -329,33 +352,31 @@ export default function Complaints() {
                   />
                 </div>
               ) : (
-                <div className="relative group rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
+                <div className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
                   <img
                     src={photoPreview}
                     alt="Incident preview"
-                    className="w-full h-40 object-cover"
+                    className="h-40 w-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+                  <div className="absolute inset-0 flex items-center justify-center gap-2 bg-slate-900/40 opacity-0 transition-opacity duration-200 group-hover:opacity-100 backdrop-blur-xs">
                     <button
                       type="button"
                       onClick={() => setLightboxUrl(photoPreview)}
-                      className="p-2 bg-white/90 rounded-lg hover:bg-white transition-colors shadow-sm"
+                      className="rounded-xl bg-white/90 p-2 text-slate-700 shadow-md transition-transform hover:scale-105 hover:bg-white"
                     >
-                      <ZoomIn size={16} className="text-gray-700" />
+                      <ZoomIn size={16} />
                     </button>
                     <button
                       type="button"
                       onClick={removePhoto}
-                      className="p-2 bg-white/90 rounded-lg hover:bg-red-50 transition-colors shadow-sm"
+                      className="rounded-xl bg-white/90 p-2 text-rose-600 shadow-md transition-transform hover:scale-105 hover:bg-rose-50"
                     >
-                      <X size={16} className="text-red-500" />
+                      <X size={16} />
                     </button>
                   </div>
-                  <div className="px-3 py-2 flex items-center justify-between">
-                    <p className="text-[11px] text-gray-500 truncate">
-                      {photoFile?.name}
-                    </p>
-                    <p className="text-[10px] text-gray-400 flex-shrink-0 ml-2">
+                  <div className="flex items-center justify-between border-t border-slate-200/60 bg-white px-3 py-2">
+                    <p className="truncate text-[11px] font-semibold text-slate-600">{photoFile?.name}</p>
+                    <p className="ml-2 flex-shrink-0 text-[10px] font-medium text-slate-400">
                       {photoFile && (photoFile.size / 1024).toFixed(0)} KB
                     </p>
                   </div>
@@ -363,12 +384,17 @@ export default function Complaints() {
               )}
             </div>
 
-            {/* Actions */}
-            <div className="flex gap-3 pt-1">
+            {/* Form Actions */}
+            <div className="flex gap-3 pt-2">
               <button
                 type="button"
-                onClick={() => { setTitle(""); setCategory(""); setDescription(""); removePhoto(); }}
-                className="flex items-center justify-center gap-2 flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
+                onClick={() => {
+                  setTitle("");
+                  setCategory("");
+                  setDescription("");
+                  removePhoto();
+                }}
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-slate-200 px-4 py-2.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-50"
               >
                 <RotateCcw size={14} />
                 Clear
@@ -378,7 +404,7 @@ export default function Complaints() {
                 id="submit-complaint-btn"
                 onClick={handleSubmit}
                 disabled={submitting}
-                className="flex items-center justify-center gap-2 flex-1 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 shadow-sm shadow-blue-500/25 transition-all disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
               >
                 {submitting ? (
                   <>
@@ -388,7 +414,7 @@ export default function Complaints() {
                 ) : (
                   <>
                     <Send size={14} />
-                    Submit
+                    Submit Request
                   </>
                 )}
               </button>
@@ -396,15 +422,16 @@ export default function Complaints() {
           </div>
         </div>
 
-        {/* ── Complaints List (Right) ── */}
-        <div className="lg:col-span-3 space-y-4">
-          {/* Filter bar */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <Filter size={15} />
-              <span className="text-[12px] font-medium">Filter:</span>
+        {/* Complaints Stream List (Right Span 3) */}
+        <div className="space-y-4 lg:col-span-3">
+          
+          {/* Filter Bar */}
+          <div className="flex flex-col gap-3 rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
+              <Filter size={14} className="text-indigo-600" />
+              <span>Filter Status:</span>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5">
               {[
                 { value: "all", label: "All" },
                 { value: "PENDING", label: "Pending" },
@@ -417,10 +444,10 @@ export default function Complaints() {
                   key={value}
                   type="button"
                   onClick={() => setFilterStatus(value)}
-                  className={`px-3 py-1.5 text-[12px] font-medium rounded-lg transition-all duration-200 ${
+                  className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-all ${
                     filterStatus === value
-                      ? "bg-gray-900 text-white shadow-sm"
-                      : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                      ? "bg-slate-900 text-white shadow-sm"
+                      : "bg-slate-100/80 text-slate-500 hover:bg-slate-200/80 hover:text-slate-700"
                   }`}
                 >
                   {label}
@@ -429,119 +456,129 @@ export default function Complaints() {
             </div>
           </div>
 
-          {/* Complaint cards */}
-          {filtered.map((complaint) => {
-            const st = STATUS_CONFIG[complaint.status] || STATUS_CONFIG.PENDING;
-            const StatusIcon = st.icon;
-            
-            // Generate full photo URL if needed
-            const displayPhotoUrl = complaint.photoUrl 
-              ? (complaint.photoUrl.startsWith('http') ? complaint.photoUrl : `http://localhost:8080${complaint.photoUrl}`) 
-              : null;
+          {/* Cards Stack */}
+          <div className="space-y-3.5">
+            {filtered.map((complaint) => {
+              const st = STATUS_CONFIG[complaint.status] || STATUS_CONFIG.PENDING;
+              const StatusIcon = st.icon;
 
-            return (
-              <div
-                key={complaint.id}
-                className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-md hover:border-gray-200 transition-all duration-200"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-start gap-3 min-w-0">
-                    <div className={`mt-0.5 w-2 h-2 rounded-full ${st.dot} flex-shrink-0`} />
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="text-[14px] font-semibold text-gray-800">{complaint.title}</h3>
-                        <span className="text-[10px] font-mono text-gray-300">#{complaint.id}</span>
-                      </div>
-                      <p className="text-[12px] text-gray-400 mt-1 leading-relaxed">{complaint.description}</p>
+              const displayPhotoUrl = complaint.photoUrl
+                ? complaint.photoUrl.startsWith("http")
+                  ? complaint.photoUrl
+                  : `http://localhost:8080${complaint.photoUrl}`
+                : null;
 
-                      {/* Incident Photo */}
-                      {displayPhotoUrl && (
-                        <div
-                          className="mt-2.5 relative group cursor-pointer rounded-lg overflow-hidden border border-gray-100 w-fit"
-                          onClick={() => setLightboxUrl(displayPhotoUrl)}
-                        >
-                          <img
-                            src={displayPhotoUrl}
-                            alt="Incident photo"
-                            className="h-28 w-auto max-w-full object-cover rounded-lg"
-                          />
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                            <div className="p-1.5 bg-white/90 rounded-lg shadow-sm">
-                              <ZoomIn size={14} className="text-gray-700" />
+              return (
+                <div
+                  key={complaint.id}
+                  className="group rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm transition-all duration-300 hover:border-slate-300 hover:shadow-md"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start gap-3 min-w-0">
+                      <div className={`mt-1.5 h-2.5 w-2.5 rounded-full ${st.dot} flex-shrink-0 ring-4 ring-slate-50`} />
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="text-sm font-bold text-slate-800">{complaint.title}</h3>
+                          <span className="rounded-md bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] font-bold text-slate-400">
+                            #{complaint.id}
+                          </span>
+                        </div>
+                        <p className="mt-1 text-xs leading-relaxed text-slate-600">{complaint.description}</p>
+
+                        {/* Incident Photo Thumbnail */}
+                        {displayPhotoUrl && (
+                          <div
+                            className="group/img relative mt-3 w-fit cursor-pointer overflow-hidden rounded-xl border border-slate-200"
+                            onClick={() => setLightboxUrl(displayPhotoUrl)}
+                          >
+                            <img
+                              src={displayPhotoUrl}
+                              alt="Incident photo"
+                              className="h-28 max-w-full object-cover rounded-xl transition-transform duration-300 group-hover/img:scale-105"
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center bg-slate-900/30 opacity-0 transition-opacity group-hover/img:opacity-100 backdrop-blur-xs">
+                              <div className="rounded-lg bg-white/90 p-1.5 text-slate-700 shadow-sm">
+                                <ZoomIn size={14} />
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      )}
+                        )}
 
-                      {/* Remarks (shown when available) */}
-                      {complaint.subWardenRemarks && (
-                        <div className="mt-2 px-3 py-2 bg-indigo-50/50 border border-indigo-100 rounded-lg">
-                          <p className="text-[11px] font-semibold text-indigo-600">Sub Warden Remarks:</p>
-                          <p className="text-[11px] text-indigo-500 mt-0.5">{complaint.subWardenRemarks}</p>
-                        </div>
-                      )}
-                      
-                      {complaint.maintenanceRemarks && (
-                        <div className="mt-2 px-3 py-2 bg-emerald-50/50 border border-emerald-100 rounded-lg">
-                          <p className="text-[11px] font-semibold text-emerald-600">Maintenance Remarks:</p>
-                          <p className="text-[11px] text-emerald-500 mt-0.5">{complaint.maintenanceRemarks}</p>
-                        </div>
-                      )}
+                        {/* Sub Warden Remarks */}
+                        {complaint.subWardenRemarks && (
+                          <div className="mt-3 rounded-xl border border-indigo-100 bg-indigo-50/60 p-3">
+                            <p className="text-[11px] font-bold text-indigo-700">Sub Warden Remarks:</p>
+                            <p className="mt-0.5 text-[11px] font-medium text-indigo-600">{complaint.subWardenRemarks}</p>
+                          </div>
+                        )}
+
+                        {/* Maintenance Remarks */}
+                        {complaint.maintenanceRemarks && (
+                          <div className="mt-3 rounded-xl border border-emerald-100 bg-emerald-50/60 p-3">
+                            <p className="text-[11px] font-bold text-emerald-700">Maintenance Remarks:</p>
+                            <p className="mt-0.5 text-[11px] font-medium text-emerald-600">{complaint.maintenanceRemarks}</p>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                  <span className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full flex-shrink-0 ${st.color}`}>
-                    <StatusIcon size={11} />
-                    {st.label}
-                  </span>
-                </div>
 
-                <div className="flex items-center gap-3 mt-4 pt-3 border-t border-gray-50">
-                  <span className="flex items-center gap-1 text-[11px] text-gray-400">
-                    <Tag size={10} />
-                    {complaint.category}
-                  </span>
-                  <span className="flex items-center gap-1 text-[11px] text-gray-400">
-                    <CalendarDays size={10} />
-                    {complaint.createdAt ? new Date(complaint.createdAt).toLocaleDateString() : ""}
-                  </span>
-                  {complaint.roomNumber && (
-                    <span className="text-[11px] text-gray-400">
-                      {complaint.hostelName} · Room {complaint.roomNumber}
+                    <span className={`inline-flex flex-shrink-0 items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-bold ${st.color}`}>
+                      <StatusIcon size={12} />
+                      {st.label}
                     </span>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+                  </div>
 
-          {filtered.length === 0 && (
-            <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-              <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-3">
-                <MessageSquareWarning size={20} className="text-gray-300" />
+                  {/* Card Meta Footer */}
+                  <div className="mt-4 flex flex-wrap items-center gap-4 border-t border-slate-100 pt-3 text-[11px] font-semibold text-slate-400">
+                    <span className="flex items-center gap-1 text-slate-500">
+                      <Tag size={12} className="text-indigo-500" />
+                      {complaint.category}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <CalendarDays size={12} />
+                      {complaint.createdAt ? new Date(complaint.createdAt).toLocaleDateString() : "—"}
+                    </span>
+                    {complaint.roomNumber && (
+                      <span className="flex items-center gap-1 text-slate-500">
+                        <MapPin size={12} className="text-slate-400" />
+                        {complaint.hostelName} · Room {complaint.roomNumber}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+
+            {filtered.length === 0 && (
+              <div className="rounded-2xl border border-slate-200/70 bg-white p-12 text-center">
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
+                  <MessageSquareWarning size={22} />
+                </div>
+                <p className="text-sm font-bold text-slate-700">No complaints found</p>
+                <p className="mt-1 text-xs text-slate-400">Try switching your filter status or submit a new complaint.</p>
               </div>
-              <p className="text-sm text-gray-400">No complaints found</p>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
       {/* ── Lightbox Modal ── */}
       {lightboxUrl && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-md animate-in fade-in"
           onClick={() => setLightboxUrl(null)}
         >
-          <div className="relative max-w-3xl max-h-[85vh] w-full" onClick={(e) => e.stopPropagation()}>
+          <div className="relative max-h-[85vh] max-w-3xl w-full" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => setLightboxUrl(null)}
-              className="absolute -top-3 -right-3 z-10 p-2 bg-white rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+              className="absolute -right-3 -top-3 z-10 rounded-full bg-white p-2 text-slate-700 shadow-xl transition-transform hover:scale-110 hover:bg-slate-100"
             >
-              <X size={18} className="text-gray-700" />
+              <X size={18} />
             </button>
             <img
               src={lightboxUrl}
               alt="Incident photo (full size)"
-              className="w-full h-auto max-h-[85vh] object-contain rounded-2xl shadow-2xl"
+              className="h-auto max-h-[85vh] w-full rounded-2xl object-contain shadow-2xl"
             />
           </div>
         </div>

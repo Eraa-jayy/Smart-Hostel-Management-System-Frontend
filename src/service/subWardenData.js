@@ -200,7 +200,12 @@ export const getStudentsPool = () => {
 // Get current allocations
 export const getAllocations = () => {
   seedSubWardenData();
-  return JSON.parse(localStorage.getItem("sw_allocations"));
+  const allocations = JSON.parse(localStorage.getItem("sw_allocations") || "[]").map((allocation) => ({
+    ...allocation,
+    status: allocation.status || "ACTIVE",
+  }));
+  localStorage.setItem("sw_allocations", JSON.stringify(allocations));
+  return allocations;
 };
 
 // Allocate a student to a room
@@ -226,7 +231,8 @@ export const allocateStudentToRoom = (student, roomNo, block = "Block A") => {
     regNo: student.regNo,
     academicYear: student.academicYear,
     roomNo: roomNo,
-    block: block
+    block: block,
+    status: "ACTIVE"
   };
   allocations.push(newAllocation);
   localStorage.setItem("sw_allocations", JSON.stringify(allocations));
@@ -258,6 +264,17 @@ export const releaseStudentFromRoom = (allocationId) => {
 
   localStorage.setItem("sw_students_pool", JSON.stringify(pool));
   localStorage.setItem("sw_allocations", JSON.stringify(updatedAllocations));
+};
+
+export const updateStudentAllocationStatus = (allocationId, status) => {
+  const allocations = getAllocations();
+  const updatedAllocations = allocations.map((allocation) =>
+    allocation.id === allocationId
+      ? { ...allocation, status: status === "INACTIVE" ? "INACTIVE" : "ACTIVE" }
+      : allocation
+  );
+  localStorage.setItem("sw_allocations", JSON.stringify(updatedAllocations));
+  return updatedAllocations.find((allocation) => allocation.id === allocationId);
 };
 
 // Edit student details in a room allocation

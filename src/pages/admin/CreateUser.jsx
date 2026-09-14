@@ -7,16 +7,15 @@ import { getAllHostels } from "../../service/hostelService.js";
 const ROLES = [
   "ADMIN",
   "STUDENT_AFFAIRS",
-  "WARDEN",
   "SUBWARDEN",
   "MAINTENANCE",
   "CANTEEN",
   "STUDENT",
 ];
 
-const STAFF_ROLES = ["WARDEN", "SUBWARDEN", "MAINTENANCE", "CANTEEN"];
+const STAFF_ROLES = ["SUBWARDEN", "MAINTENANCE", "CANTEEN"];
 
-export default function CreateUser() {
+export default function CreateUser({ embedded = false, onCreated, onCancel } = {}) {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -55,6 +54,11 @@ export default function CreateUser() {
       return;
     }
 
+    if (formData.role === "CANTEEN" && !formData.hostelId) {
+      setError("Select the hostel assigned to this canteen account");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -68,13 +72,19 @@ export default function CreateUser() {
       };
       await createUser(payload);
       alert("User created successfully");
-      navigate("/admin/users");
+      if (onCreated) {
+        onCreated();
+      } else {
+        navigate("/admin/users");
+      }
     } catch (err) {
       console.log(err);
       const msg =
         typeof err.response?.data === "string"
           ? err.response.data
-          : "Failed to create user";
+          : err.response?.data?.message ||
+            err.response?.data?.error ||
+            "Failed to create user";
       setError(msg);
     } finally {
       setLoading(false);
@@ -82,25 +92,27 @@ export default function CreateUser() {
   };
 
   return (
-    <div className="max-w-xl space-y-6">
-      <button
-        onClick={() => navigate("/admin/users")}
-        className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
-      >
-        <ArrowLeft size={16} /> Back to Users
-      </button>
+    <div className={`${embedded ? "w-full" : "max-w-xl"} space-y-6`}>
+      {!embedded && (
+        <button
+          onClick={() => (onCancel ? onCancel() : navigate("/admin/users"))}
+          className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+        >
+          <ArrowLeft size={16} /> Back to Users
+        </button>
+      )}
 
       <div className="flex items-end justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Create User</h1>
-          <p className="text-sm text-gray-400 mt-0.5">
+          {/* <p className="text-sm text-gray-400 mt-0.5">
             Manually create a staff or admin account
-          </p>
+          </p> */}
         </div>
-        <div className="flex items-center gap-2 text-xs text-gray-400">
+        {/* <div className="flex items-center gap-2 text-xs text-gray-400">
           <CalendarDays size={14} />
           <span>{new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</span>
-        </div>
+        </div> */}
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 p-6">
@@ -161,9 +173,14 @@ export default function CreateUser() {
                 name="hostelId"
                 value={formData.hostelId}
                 onChange={handleChange}
+                required={formData.role === "CANTEEN"}
                 className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-400"
               >
-                <option value="">Select Hostel (Optional / Recommended)</option>
+                <option value="">
+                  {formData.role === "CANTEEN"
+                    ? "Select Hostel (Required)"
+                    : "Select Hostel (Optional / Recommended)"}
+                </option>
                 {hostels.map((h) => (
                   <option key={h.id} value={h.id}>
                     {h.hostelName} ({h.location || h.hostelType})

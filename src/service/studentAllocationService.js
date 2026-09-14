@@ -2,9 +2,18 @@ import axios from "axios";
 import api from "./axios";
 
 // BULK UPLOAD STUDENTS VIA EXCEL
-export const bulkUploadStudents = (file, floorId, academicYear,expectedReleaseDate) => {
+export const bulkUploadStudents = (
+  file,
+  hostelId,
+  buildingId,
+  floorId,
+  academicYear,
+  expectedReleaseDate
+) => {
   const formData = new FormData();
   formData.append("file", file);
+  formData.append("hostelId", hostelId);
+  formData.append("buildingId", buildingId);
   formData.append("floorId", floorId);
   formData.append("academicYear", academicYear);
   formData.append("expectedReleaseDate", expectedReleaseDate);
@@ -37,10 +46,16 @@ export const getRoomMembers = (roomId) => {
 };
 
 export const updateAllocationStatus = (id, status) =>{
-    return axios.put(
-       `/allocations/status/${id}?status=${status}` 
+    return api.put(
+       `/allocations/status/${id}?status=${encodeURIComponent(status)}` 
     );
 };
+
+export const getSubWardenAllocations = () => api.get("/allocations/subwarden");
+export const updateSubWardenStudentStatus = (id, status) =>
+  api.put(`/allocations/subwarden/${id}/status?status=${encodeURIComponent(status)}`);
+export const removeSubWardenStudent = (id) =>
+  api.put(`/allocations/subwarden/${id}/remove`);
 
 export const getMyRoomDetails = () => {
     return api.get("/allocations/my-room")

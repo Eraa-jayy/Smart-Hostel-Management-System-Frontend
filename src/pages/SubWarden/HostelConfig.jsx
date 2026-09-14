@@ -72,10 +72,10 @@ export default function HostelConfig() {
   const totalBeds = totalRooms * config.roomCapacity;
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-5 sm:space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Hostel Configuration</h1>
+        <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">Hostel Configuration</h1>
         <p className="text-sm text-gray-400 mt-0.5">
           Edit and adjust the physical structure layout of the hostel (blocks, floors, rooms, capacity parameters).
         </p>
@@ -83,7 +83,7 @@ export default function HostelConfig() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Settings Form (Left - 2 Cols) */}
-        <div className="lg:col-span-2 bg-white rounded-3xl border border-gray-150 p-6">
+        <div className="rounded-3xl border border-gray-150 bg-white p-4 sm:p-6 lg:col-span-2">
           <div className="flex items-center gap-2.5 mb-6">
             <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
               <Sliders size={18} />

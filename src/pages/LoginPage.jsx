@@ -34,11 +34,18 @@ export default function LoginPage() {
 
   const handleLogin = async () => {
     setError("");
+
+    const normalizedUsername = username.trim();
+    if (!normalizedUsername || !password) {
+      setError("Enter both username and password.");
+      return;
+    }
+
     setLoading(true);
 
     try {
       const response = await api.post("/auth/login", {
-        username,
+        username: normalizedUsername,
         password,
       });
 
@@ -48,7 +55,7 @@ export default function LoginPage() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("username", data.username);
       localStorage.setItem("role", data.role);
-      localStorage.setItem("fullName", data.fullName);
+      localStorage.setItem("fullName", data.fullName || data.username);
 
       if(data.forcePasswordChange){
         navigate("/change-password");
@@ -83,18 +90,12 @@ export default function LoginPage() {
           navigate("/");
       }
     } catch (error) {
-      console.log("FULL FAILED : ", error);
-
-      console.log(
-        "STATUS :",
-        error.response?.status
+      console.error("Login failed", error);
+      setError(
+        [401, 403].includes(error.response?.status)
+          ? "Invalid username or password. Check that this account is enabled."
+          : "Unable to log in. Please try again."
       );
-
-      console.log("DATA :",
-        error.response?.data
-      );
-
-      setError("Invalid username or password");
     } finally {
       setLoading(false);
     }
@@ -151,44 +152,62 @@ export default function LoginPage() {
           )}
         </div>
 
-        <label className="text-sm">Username</label>
-        <div className="flex items-center bg-slate-50 border rounded-xl px-4 py-3 mb-5">
-          <AtSign size={18} />
-          <input
-            className="ml-3 w-full bg-transparent outline-none"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Username"
-          />
-        </div>
-
-        <label className="text-sm">Password</label>
-        <div className="flex items-center bg-slate-50 border rounded-xl px-4 py-3 mb-5">
-          <Lock size={18} />
-          <input
-            type={showPassword ? "text" : "password"}
-            className="ml-3 w-full bg-transparent outline-none"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-          />
-          <button onClick={() => setShowPassword(!showPassword)}>
-            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-          </button>
-        </div>
-
-        {error && (
-          <p className="text-red-500 text-center mb-4">{error}</p>
-        )}
-
-        <button
-          onClick={handleLogin}
-          disabled={loading}
-          className="w-full bg-[#101c5c] text-white rounded-xl py-4 flex justify-center gap-2"
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            handleLogin();
+          }}
+          autoComplete="on"
         >
-          {loading ? "Logging in..." : "Login to Account"}
-          <LogIn size={18} />
-        </button>
+          <label className="text-sm" htmlFor="login-username">Username</label>
+          <div className="flex items-center bg-slate-50 border rounded-xl px-4 py-3 mb-5">
+            <AtSign size={18} />
+            <input
+              id="login-username"
+              name="username"
+              autoComplete="username"
+              className="ml-3 w-full bg-transparent outline-none"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Username"
+            />
+          </div>
+
+          <label className="text-sm" htmlFor="login-password">Password</label>
+          <div className="flex items-center bg-slate-50 border rounded-xl px-4 py-3 mb-5">
+            <Lock size={18} />
+            <input
+              id="login-password"
+              name="password"
+              type={showPassword ? "text" : "password"}
+              autoComplete="current-password"
+              className="ml-3 w-full bg-transparent outline-none"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+
+          {error && (
+            <p className="text-red-500 text-center mb-4">{error}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-[#101c5c] text-white rounded-xl py-4 flex justify-center gap-2"
+          >
+            {loading ? "Logging in..." : "Login to Account"}
+            <LogIn size={18} />
+          </button>
+        </form>
 
         <hr className="my-6" />
 

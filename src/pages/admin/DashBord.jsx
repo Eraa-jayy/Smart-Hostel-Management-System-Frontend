@@ -6,32 +6,23 @@ import {
   UserX,
   GraduationCap,
   CalendarDays,
-  UserPlus,
-  Shield,
-  Building2,
-  ClipboardList,
-  UserCog,
-  Activity,
-  UserCircle,
-  CheckCircle2,
-  XCircle,
-  Clock,
+  Sparkles,
+  RefreshCw,
+  ShieldCheck,
+  ArrowRight,
 } from "lucide-react";
-import StatCard from "../../components/admin/StatCard";
+import DashboardCard from "../../components/studentAffairs/DashboardCard";
 import { getAllUsers } from "../../service/adminService";
 
 export default function Dashboard() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadUsers();
-  }, []);
-
   const loadUsers = async () => {
+    setLoading(true);
     try {
       const response = await getAllUsers();
-      setUsers(response.data);
+      setUsers(response.data || []);
     } catch (error) {
       console.log(error);
     } finally {
@@ -39,265 +30,156 @@ export default function Dashboard() {
     }
   };
 
-  const totalUsers = users.length;
-  const activeUsers = users.filter((u) => u.enabled).length;
-  const disabledUsers = users.filter((u) => !u.enabled).length;
-  const studentUsers = users.filter((u) => u.role === "STUDENT").length;
+  useEffect(() => {
+    loadUsers();
+  }, []);
 
-  const roleCounts = {};
-  users.forEach((u) => {
-    roleCounts[u.role] = (roleCounts[u.role] || 0) + 1;
-  });
+  const roleCounts = users.reduce((counts, user) => {
+    counts[user.role] = (counts[user.role] || 0) + 1;
+    return counts;
+  }, {});
 
   const roleDistribution = [
-    { role: "ADMIN", count: roleCounts["ADMIN"] || 0, color: "bg-blue-500", textColor: "text-blue-600", bgColor: "bg-blue-50" },
-    { role: "STUDENT_AFFAIRS", count: roleCounts["STUDENT_AFFAIRS"] || 0, color: "bg-emerald-500", textColor: "text-emerald-600", bgColor: "bg-emerald-50" },
-    { role: "WARDEN", count: roleCounts["WARDEN"] || 0, color: "bg-amber-500", textColor: "text-amber-600", bgColor: "bg-amber-50" },
-    { role: "SUBWARDEN", count: roleCounts["SUBWARDEN"] || 0, color: "bg-violet-500", textColor: "text-violet-600", bgColor: "bg-violet-50" },
-    { role: "STUDENT", count: roleCounts["STUDENT"] || 0, color: "bg-rose-500", textColor: "text-rose-600", bgColor: "bg-rose-50" },
+    { role: "ADMIN", color: "bg-blue-500", label: "Administrators" },
+    { role: "STUDENT_AFFAIRS", color: "bg-emerald-500", label: "Student Affairs" },
+    { role: "SUBWARDEN", color: "bg-violet-500", label: "Sub-Wardens" },
+    { role: "STUDENT", color: "bg-rose-500", label: "Students" },
   ];
 
-  const studentAffairsUsers = users.filter((u) => u.role === "STUDENT_AFFAIRS");
-  const activeStudentAffairs = studentAffairsUsers.filter((u) => u.enabled).length;
-
-  const recentUsers = [...users].reverse().slice(0, 5);
-
-  const adminActions = users
-    .filter((u) => u.role === "ADMIN")
-    .slice(0, 3)
-    .map((u) => ({
-      text: `Account: ${u.username}`,
-      status: u.enabled ? "Active" : "Disabled",
-      type: u.enabled ? "success" : "warning",
-    }));
-
-  const STATS = [
-    { label: "Total Users", value: totalUsers, icon: Users, bg: "bg-blue-50", iconColor: "text-blue-600", change: "All time", up: true },
-    { label: "Active Users", value: activeUsers, icon: UserCheck, bg: "bg-emerald-50", iconColor: "text-emerald-600", change: "Active", up: true },
-    { label: "Disabled Users", value: disabledUsers, icon: UserX, bg: "bg-red-50", iconColor: "text-red-600", change: "Inactive", up: false },
-    { label: "Student Accounts", value: studentUsers, icon: GraduationCap, bg: "bg-violet-50", iconColor: "text-violet-600", change: "Enrolled", up: true },
+  const stats = [
+    {
+      title: "Total Accounts",
+      value: users.length,
+      sub: "Registered system users",
+      icon: Users,
+      accent: "from-blue-500 to-indigo-600",
+      lightBg: "bg-blue-50 text-blue-600",
+      change: "All time",
+    },
+    {
+      title: "Active Accounts",
+      value: users.filter((u) => u.enabled).length,
+      sub: "Enabled login credentials",
+      icon: UserCheck,
+      accent: "from-emerald-500 to-teal-600",
+      lightBg: "bg-emerald-50 text-emerald-600",
+      change: "Active",
+    },
+    {
+      title: "Disabled Accounts",
+      value: users.filter((u) => !u.enabled).length,
+      sub: "Suspended or deactivated",
+      icon: UserX,
+      accent: "from-rose-500 to-red-600",
+      lightBg: "bg-rose-50 text-rose-600",
+      change: "Inactive",
+    },
+    {
+      title: "Student Accounts",
+      value: roleCounts.STUDENT || 0,
+      sub: "Enrolled hostel residents",
+      icon: GraduationCap,
+      accent: "from-purple-500 to-violet-600",
+      lightBg: "bg-purple-50 text-purple-600",
+      change: "Enrolled",
+    },
   ];
-
-  const quickActions = [
-    { label: "Create User", icon: UserPlus, path: "/admin/users/create", color: "bg-blue-50 text-blue-600" },
-    { label: "View Users", icon: Users, path: "/admin/users", color: "bg-emerald-50 text-emerald-600" },
-    { label: "Manage Roles", icon: UserCog, path: "/admin/roles", color: "bg-amber-50 text-amber-600" },
-    { label: "Student Affairs", icon: Building2, path: "/admin/student-affairs", color: "bg-violet-50 text-violet-600" },
-  ];
-
-  if (loading) {
-    return <div className="text-center text-gray-400 p-10">Loading...</div>;
-  }
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-sm text-gray-400 mt-0.5">
-            Overview of system activity and user management
-          </p>
-        </div>
-        <div className="flex items-center gap-2 text-xs text-gray-400">
-          <CalendarDays size={14} />
-          <span>{new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</span>
+    <div className="space-y-6 pb-12">
+      {/* ── Top Hero Banner ── */}
+      <div className="w-full">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-900 p-6 text-white shadow-2xl shadow-indigo-950/20 sm:p-8 lg:p-10">
+          <div className="relative z-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+            <div className="max-w-2xl">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-400/30 bg-blue-500/20 px-3.5 py-1 text-xs font-semibold tracking-wide text-blue-200 backdrop-blur-md">
+                <Sparkles size={13} className="text-blue-300" />
+                System Overview & Management
+              </span>
+
+              <h1 className="mt-3 text-2xl font-black tracking-tight text-white sm:text-3xl lg:text-4xl">
+                Administrator Dashboard
+              </h1>
+
+              <p className="mt-2 text-sm leading-relaxed text-slate-300 sm:text-base">
+                Monitor user accounts, manage security access levels, and review system-wide role distribution.
+              </p>
+            </div>
+
+            {/* <button
+              onClick={loadUsers}
+              className="flex items-center gap-2 self-start rounded-2xl border border-white/20 bg-white/10 px-4 py-2.5 text-xs font-bold text-white backdrop-blur-md transition-all duration-200 hover:bg-white/20 hover:shadow-lg sm:self-auto"
+            >
+              <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
+              Refresh Analytics
+            </button> */}
+          </div>
+
+          {/* Ambient Lighting & Glassmorphism Overlay */}
+          <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-20 right-20 h-56 w-56 rounded-full bg-indigo-500/25 blur-3xl" />
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        {STATS.map((stat) => (
-          <StatCard key={stat.label} {...stat} />
+      {/* ── Sub-header Meta Bar ── */}
+      <div className="flex items-center justify-between px-1">
+        <div>
+          <h2 className="text-base font-bold text-slate-800">System Activity</h2>
+          <p className="text-xs text-slate-400">Live summary of administrative metric counters</p>
+        </div>
+        <div className="flex items-center gap-2 rounded-xl border border-slate-200/80 bg-white px-3 py-1.5 text-xs font-medium text-slate-500 shadow-sm">
+          <CalendarDays size={14} className="text-indigo-600" />
+          <span>{new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })}</span>
+        </div>
+      </div>
+
+      {/* ── Metric Summary Cards ── */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {stats.map((stat) => (
+          <DashboardCard key={stat.title} {...stat} />
         ))}
       </div>
 
-      {/* Row: Quick Actions + Role Management Overview */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Quick Actions */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-5">
-          <h3 className="text-sm font-semibold text-gray-800 mb-4">Quick Actions</h3>
-          <div className="grid grid-cols-2 gap-3">
-            {quickActions.map(({ label, icon: Icon, path, color }) => (
-              <Link
-                key={label}
-                to={path}
-                className="group flex flex-col items-center gap-2.5 p-4 rounded-xl border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all duration-200"
-              >
-                <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center transition-transform duration-200 group-hover:scale-110`}>
-                  <Icon size={18} strokeWidth={2} />
-                </div>
-                <span className="text-xs font-medium text-gray-600">{label}</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        {/* Role Management Overview */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-gray-800">Role Management Overview</h3>
-            <Link to="/admin/roles" className="text-[11px] font-medium text-blue-600 hover:text-blue-700 transition-colors">
-              View Details
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-            {roleDistribution.map(({ role, count, color, textColor, bgColor }) => (
-              <Link
-                key={role}
-                to={`/admin/users?role=${role}`}
-                className="group p-4 rounded-xl border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all duration-200 text-center"
-              >
-                <div className={`w-3 h-3 rounded-full ${color} mx-auto mb-2`} />
-                <p className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{count}</p>
-                <p className="text-[11px] font-medium text-gray-400 mt-0.5 truncate">{role.replace(/_/g, " ")}</p>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Row: Recent Users + User Activity Monitoring */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Recent Users */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-gray-800">Recent Users</h3>
-            <Link to="/admin/users" className="text-[11px] font-medium text-blue-600 hover:text-blue-700 transition-colors">
-              View All
-            </Link>
-          </div>
-          <div className="space-y-1">
-            {recentUsers.map((user) => (
-              <div
-                key={user.id}
-                className="flex items-center justify-between py-2.5 border-b border-gray-50 last:border-0"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-[11px] font-bold text-gray-500">
-                    {user.username?.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-700">{user.username}</p>
-                    <p className="text-xs text-gray-400">{user.role}</p>
-                  </div>
-                </div>
-                <span
-                  className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${
-                    user.enabled ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"
-                  }`}
-                >
-                  {user.enabled ? "Active" : "Disabled"}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* User Activity Monitoring */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-gray-800">User Activity Monitoring</h3>
-            <span className="text-[11px] font-medium text-gray-400 flex items-center gap-1">
-              <Activity size={12} />
-              Live
-            </span>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-            <div className="p-4 rounded-xl bg-blue-50/60 border border-blue-100/50">
-              <p className="text-xs text-blue-500 mb-1">Total Accounts</p>
-              <p className="text-lg font-bold text-gray-900">{totalUsers}</p>
-            </div>
-            <div className="p-4 rounded-xl bg-emerald-50/60 border border-emerald-100/50">
-              <p className="text-xs text-emerald-500 mb-1">Active Accounts</p>
-              <p className="text-lg font-bold text-gray-900">{activeUsers}</p>
-            </div>
-            <div className="p-4 rounded-xl bg-red-50/60 border border-red-100/50">
-              <p className="text-xs text-red-500 mb-1">Disabled Accounts</p>
-              <p className="text-lg font-bold text-gray-900">{disabledUsers}</p>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Recent Account Activity</p>
-            <div className="space-y-1">
-              {recentUsers.map((user, i) => (
-                <div key={user.id} className="flex items-center gap-3 py-2 border-b border-gray-50 last:border-0">
-                  <div className={`w-2 h-2 rounded-full ${user.enabled ? "bg-emerald-400" : "bg-red-400"}`} />
-                  <p className="text-[13px] text-gray-600 flex-1">
-                    <span className="font-medium text-gray-800">{user.username}</span>{" "}
-                    account is <span className={user.enabled ? "text-emerald-600" : "text-red-600"}>{user.enabled ? "active" : "disabled"}</span>
-                  </p>
-                  <span className="text-xs text-gray-400">{user.role}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom: Student Affairs Overview + System Status */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Student Affairs Account Management Overview */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-gray-800">Student Affairs Accounts</h3>
-            <Link to="/admin/student-affairs" className="text-[11px] font-medium text-blue-600 hover:text-blue-700 transition-colors">
-              Manage
-            </Link>
-          </div>
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-14 h-14 rounded-2xl bg-violet-50 flex items-center justify-center">
-              <Building2 size={24} className="text-violet-600" />
+      {/* ── Role Management Distribution Grid ── */}
+      <div className="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm transition-all duration-300 hover:border-slate-300 hover:shadow-md">
+        <div className="mb-5 flex items-center justify-between border-b border-slate-100 pb-4">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+              <ShieldCheck size={18} />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900">{studentAffairsUsers.length}</p>
-              <p className="text-xs text-gray-400">
-                {activeStudentAffairs} active · {studentAffairsUsers.length - activeStudentAffairs} disabled
-              </p>
+              <h3 className="text-base font-bold text-slate-800">Role Management Overview</h3>
+              <p className="text-xs text-slate-400">Distribution of permission tiers across registered users</p>
             </div>
           </div>
-          <div className="space-y-2">
-            {studentAffairsUsers.slice(0, 3).map((user) => (
-              <div key={user.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
-                <div className="flex items-center gap-2">
-                  <UserCircle size={14} className="text-gray-400" />
-                  <span className="text-sm text-gray-700">{user.username}</span>
-                </div>
-                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${user.enabled ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"}`}>
-                  {user.enabled ? "Active" : "Disabled"}
-                </span>
-              </div>
-            ))}
-          </div>
+          <Link
+            to="/admin/roles"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-slate-100 px-3 py-1.5 text-xs font-bold text-indigo-600 transition-colors hover:bg-slate-200"
+          >
+            <span>View Details</span>
+            <ArrowRight size={13} />
+          </Link>
         </div>
 
-        {/* System Status */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-gray-800">System Status</h3>
-            <span className="text-[11px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              All Systems Online
-            </span>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl bg-gray-50/80">
-              <p className="text-xs text-gray-400 mb-1">User Accounts</p>
-              <p className="text-lg font-bold text-gray-900">{totalUsers}</p>
-            </div>
-            <div className="p-4 rounded-xl bg-gray-50/80">
-              <p className="text-xs text-gray-400 mb-1">Active Sessions</p>
-              <p className="text-lg font-bold text-gray-900">{activeUsers}</p>
-            </div>
-            <div className="p-4 rounded-xl bg-gray-50/80">
-              <p className="text-xs text-gray-400 mb-1">Active Roles</p>
-              <p className="text-lg font-bold text-gray-900">{new Set(users.map((u) => u.role)).size}</p>
-            </div>
-            <div className="p-4 rounded-xl bg-gray-50/80">
-              <p className="text-xs text-gray-400 mb-1">Admin Accounts</p>
-              <p className="text-lg font-bold text-gray-900">{roleCounts["ADMIN"] || 0}</p>
-            </div>
-          </div>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
+          {roleDistribution.map(({ role, color, label }) => (
+            <Link
+              key={role}
+              to={`/admin/users?role=${role}`}
+              className="group relative overflow-hidden rounded-2xl border border-slate-200/70 bg-slate-50/50 p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:bg-white hover:shadow-lg"
+            >
+              <div className={`mx-auto mb-2.5 h-3 w-3 rounded-full ${color} shadow-sm`} />
+              <p className="text-2xl font-black tracking-tight text-slate-900 group-hover:text-indigo-600 transition-colors">
+                {roleCounts[role] || 0}
+              </p>
+              <p className="mt-1 truncate text-xs font-bold text-slate-500">
+                {label}
+              </p>
+              <p className="mt-0.5 font-mono text-[10px] font-semibold text-slate-400">
+                {role}
+              </p>
+            </Link>
+          ))}
         </div>
       </div>
     </div>

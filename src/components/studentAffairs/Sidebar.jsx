@@ -78,20 +78,23 @@ export default function Sidebar({ onOpenProfile, profileImage }) {
   return (
     <>
       <aside className="sticky top-0 z-30 flex h-screen w-[260px] flex-shrink-0 self-start flex-col border-r border-white/5 bg-[#0a0f1e] shadow-2xl shadow-slate-950/30">
-        <div className="px-6 pt-7 pb-6">
+        <div className="px-6 pb-6 pt-7">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/25">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/25">
               <Building2 size={20} className="text-white" />
             </div>
             <div>
-              <h1 className="text-base font-bold tracking-tight text-white">UniNest</h1>
+              <h1 className="text-sm font-bold leading-snug tracking-tight text-white">
+                Smart Hostel Management System
+              </h1>
+              <p className="text-[11px] font-medium text-slate-500">Student Affairs Portal</p>
             </div>
           </div>
         </div>
 
         <div className="mx-5 h-px bg-white/5" />
 
-        <p className="px-6 pt-5 pb-2 text-[10px] font-semibold uppercase tracking-widest text-white/60">
+        <p className="px-6 pb-2 pt-5 text-[10px] font-semibold uppercase tracking-widest text-white/60">
           Main Menu
         </p>
 
@@ -100,7 +103,7 @@ export default function Sidebar({ onOpenProfile, profileImage }) {
             <NavLink
               key={path}
               to={path}
-                className={({ isActive }) =>
+              className={({ isActive }) =>
                 `group flex min-h-[46px] w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200 ${
                   isActive
                     ? "bg-blue-500/10 text-blue-400 shadow-sm shadow-blue-500/5"

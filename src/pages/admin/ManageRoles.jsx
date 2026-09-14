@@ -6,7 +6,6 @@ import {
   Users,
   Building2,
   GraduationCap,
-  Swords,
   UserCog,
   ArrowRight,
 } from "lucide-react";
@@ -15,7 +14,6 @@ import { getAllUsers } from "../../service/adminService";
 const ROLE_CONFIG = [
   { role: "ADMIN", label: "Admin", icon: Shield, color: "bg-blue-500", textColor: "text-blue-600", bgColor: "bg-blue-50", borderColor: "border-blue-200" },
   { role: "STUDENT_AFFAIRS", label: "Student Affairs", icon: Building2, color: "bg-emerald-500", textColor: "text-emerald-600", bgColor: "bg-emerald-50", borderColor: "border-emerald-200" },
-  { role: "WARDEN", label: "Warden", icon: Swords, color: "bg-amber-500", textColor: "text-amber-600", bgColor: "bg-amber-50", borderColor: "border-amber-200" },
   { role: "SUBWARDEN", label: "Subwarden", icon: UserCog, color: "bg-violet-500", textColor: "text-violet-600", bgColor: "bg-violet-50", borderColor: "border-violet-200" },
   { role: "STUDENT", label: "Student", icon: GraduationCap, color: "bg-rose-500", textColor: "text-rose-600", bgColor: "bg-rose-50", borderColor: "border-rose-200" },
 ];
@@ -62,10 +60,10 @@ export default function ManageRoles() {
             View user distribution across all system roles
           </p>
         </div>
-        <div className="flex items-center gap-2 text-xs text-gray-400">
+        {/* <div className="flex items-center gap-2 text-xs text-gray-400">
           <CalendarDays size={14} />
           <span>{new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</span>
-        </div>
+        </div> */}
       </div>
 
       {/* Role Distribution Grid */}
@@ -111,46 +109,6 @@ export default function ManageRoles() {
         })}
       </div>
 
-      {/* Summary Table */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-5">
-        <h3 className="text-sm font-semibold text-gray-800 mb-4">Role Distribution Summary</h3>
-        <div className="overflow-hidden rounded-xl border border-gray-100">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-gray-50">
-                <th className="p-3 text-left font-semibold text-gray-600 text-[11px] uppercase tracking-wider">Role</th>
-                <th className="p-3 text-center font-semibold text-gray-600 text-[11px] uppercase tracking-wider">Total</th>
-                <th className="p-3 text-center font-semibold text-gray-600 text-[11px] uppercase tracking-wider">Active</th>
-                <th className="p-3 text-center font-semibold text-gray-600 text-[11px] uppercase tracking-wider">Disabled</th>
-                <th className="p-3 text-center font-semibold text-gray-600 text-[11px] uppercase tracking-wider">Active %</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ROLE_CONFIG.map(({ role, label, textColor }) => {
-                const total = roleCounts[role] || 0;
-                const active = roleActive[role] || 0;
-                const disabled = roleDisabled[role] || 0;
-                const pct = total > 0 ? Math.round((active / total) * 100) : 0;
-                return (
-                  <tr key={role} className="border-t border-gray-50 hover:bg-gray-50/50">
-                    <td className="p-3 font-medium text-gray-800">
-                      <span className={`text-xs font-semibold ${textColor}`}>{label}</span>
-                    </td>
-                    <td className="p-3 text-center font-semibold text-gray-900">{total}</td>
-                    <td className="p-3 text-center font-semibold text-emerald-600">{active}</td>
-                    <td className="p-3 text-center font-semibold text-red-500">{disabled}</td>
-                    <td className="p-3 text-center">
-                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${pct >= 80 ? "bg-emerald-50 text-emerald-600" : pct >= 50 ? "bg-amber-50 text-amber-600" : "bg-red-50 text-red-600"}`}>
-                        {pct}%
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
   );
 }

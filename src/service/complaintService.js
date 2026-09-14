@@ -113,4 +113,3 @@ export const getAllComplaints = async () => {
 // Compatibility aliases
 export const forwardComplaint = forwardComplaintToApi;
 export const declineComplaint = declineComplaintToApi;
-

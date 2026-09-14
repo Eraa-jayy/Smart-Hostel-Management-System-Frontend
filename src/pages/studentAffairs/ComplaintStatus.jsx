@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Building2, CheckCircle2, Clock3, RefreshCw, Wrench, XCircle } from "lucide-react";
+import { Building2, CheckCircle2, Clock3, Wrench, XCircle } from "lucide-react";
 import api from "../../service/axios";
 
 const STATUS_LABELS = {
@@ -33,11 +33,11 @@ const normalizeComplaint = (complaint) => ({
   description: complaint.description || "",
   category: complaint.category || "General",
   status: normalizeStatus(complaint.status),
-  studentName: complaint.studentName || "Unknown",
-  studentRegNo: complaint.studentIndexNumber || complaint.studentRegNo || "",
   roomNo: complaint.roomNumber || complaint.roomNo || "",
   hostelName: complaint.hostelName || "Unassigned hostel",
   createdAt: complaint.createdAt || complaint.date || "",
+  completedAt: complaint.completedAt || complaint.resolvedAt || complaint.resolvedDate || "",
+  photoUrl: complaint.photoUrl || "",
 });
 
 const label = (status) => STATUS_LABELS[normalizeStatus(status)] || "Pending";
@@ -48,6 +48,7 @@ export default function ComplaintStatus() {
   const [hostel, setHostel] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [selectedComplaint, setSelectedComplaint] = useState(null);
 
   const load = async () => {
     setLoading(true);
@@ -97,13 +98,6 @@ export default function ComplaintStatus() {
             Monitor student complaints and maintenance progress by hostel.
           </p>
         </div>
-        <button
-          onClick={load}
-          className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-600 transition hover:bg-gray-50"
-        >
-          <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
-          Refresh
-        </button>
       </div>
 
       <div className="flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-4 sm:flex-row sm:items-center">
@@ -150,23 +144,39 @@ export default function ComplaintStatus() {
               <thead className="bg-gray-50 text-xs uppercase text-gray-500">
                 <tr>
                   <th className="px-5 py-3">Hostel</th>
-                  <th className="px-5 py-3">Complaint</th>
-                  <th className="px-5 py-3">Room / Student</th>
+                  <th className="px-5 py-3">Room</th>
+                  <th className="px-5 py-3">Date Submitted</th>
+                  <th className="px-5 py-3">Date Resolved</th>
                   <th className="px-5 py-3">Status</th>
                 </tr>
               </thead>
               <tbody>
                 {shown.map((x) => (
-                  <tr key={x.id} className="border-t border-gray-100">
+                  <tr
+                    key={x.id}
+                    onClick={() => setSelectedComplaint(x)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        setSelectedComplaint(x);
+                      }
+                    }}
+                    tabIndex={0}
+                    role="button"
+                    className="cursor-pointer border-t border-gray-100 transition-colors hover:bg-blue-50/40 focus:bg-blue-50/40 focus:outline-none"
+                    aria-label={`View complaint details for room ${x.roomNo || "unknown"}`}
+                  >
                     <td className="px-5 py-4 font-semibold text-gray-800">
                       {x.hostelName || "Unassigned hostel"}
                     </td>
                     <td className="px-5 py-4">
-                      <p className="font-medium text-gray-800">{x.title}</p>
-                      <p className="text-xs text-gray-500">{x.category}</p>
+                      {x.roomNo || "—"}
                     </td>
                     <td className="px-5 py-4 text-gray-600">
-                      {x.roomNo || "—"} · {x.studentName || "—"}
+                      {x.createdAt ? new Date(x.createdAt).toLocaleDateString() : "—"}
+                    </td>
+                    <td className="px-5 py-4 text-gray-600">
+                      {x.completedAt ? new Date(x.completedAt).toLocaleDateString() : "—"}
                     </td>
                     <td className="px-5 py-4">
                       <span className={`rounded-full px-2 py-1 text-xs font-bold ${color(x.status)}`}>
@@ -183,6 +193,104 @@ export default function ComplaintStatus() {
               No complaints found for this hostel.
             </p>
           )}
+        </div>
+      )}
+
+      {selectedComplaint && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4"
+          role="presentation"
+          onClick={() => setSelectedComplaint(null)}
+        >
+          <div
+            className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl sm:p-6"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="complaint-details-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-4 border-b border-gray-100 pb-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-blue-600">
+                  Complaint details
+                </p>
+                <h2 id="complaint-details-title" className="mt-1 text-xl font-bold text-gray-900">
+                  {selectedComplaint.title || "Untitled complaint"}
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedComplaint(null)}
+                className="rounded-lg px-2 py-1 text-2xl leading-none text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+                aria-label="Close complaint details"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="mt-5 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+              <div>
+                <p className="text-xs font-semibold uppercase text-gray-400">Hostel</p>
+                <p className="mt-1 font-medium text-gray-800">{selectedComplaint.hostelName || "—"}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase text-gray-400">Room</p>
+                <p className="mt-1 font-medium text-gray-800">{selectedComplaint.roomNo || "—"}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase text-gray-400">Date submitted</p>
+                <p className="mt-1 font-medium text-gray-800">
+                  {selectedComplaint.createdAt
+                    ? new Date(selectedComplaint.createdAt).toLocaleString()
+                    : "—"}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase text-gray-400">Date resolved</p>
+                <p className="mt-1 font-medium text-gray-800">
+                  {selectedComplaint.completedAt
+                    ? new Date(selectedComplaint.completedAt).toLocaleString()
+                    : "—"}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase text-gray-400">Category</p>
+                <p className="mt-1 font-medium text-gray-800">{selectedComplaint.category || "General"}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase text-gray-400">Status</p>
+                <span className={`mt-1 inline-block rounded-full px-2 py-1 text-xs font-bold ${color(selectedComplaint.status)}`}>
+                  {label(selectedComplaint.status)}
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-5">
+              <p className="text-xs font-semibold uppercase text-gray-400">Description</p>
+              <p className="mt-1 whitespace-pre-wrap rounded-xl bg-gray-50 p-3 text-sm leading-relaxed text-gray-700">
+                {selectedComplaint.description || "No description provided."}
+              </p>
+            </div>
+
+            <div className="mt-5">
+              <p className="text-xs font-semibold uppercase text-gray-400">Attached photo</p>
+              {selectedComplaint.photoUrl ? (
+                <img
+                  src={
+                    selectedComplaint.photoUrl.startsWith("http")
+                      ? selectedComplaint.photoUrl
+                      : `http://localhost:8080${selectedComplaint.photoUrl}`
+                  }
+                  alt="Complaint attachment"
+                  className="mt-2 max-h-96 w-full rounded-xl border border-gray-200 object-contain"
+                />
+              ) : (
+                <p className="mt-1 rounded-xl bg-gray-50 p-3 text-sm text-gray-500">
+                  No photo attached.
+                </p>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>

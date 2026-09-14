@@ -62,11 +62,16 @@ export default function UserTable({ users, onToggleStatus, onDelete }) {
                     <Eye size={16} />
                   </button>
                   <button
-                    onClick={() => onToggleStatus(user.id)}
-                    className="p-2 rounded-lg hover:bg-amber-50 text-gray-500 hover:text-amber-600 transition-colors"
-                    title={user.enabled ? "Disable" : "Enable"}
+                    onClick={() => onToggleStatus(user)}
+                    className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-2 text-xs font-semibold transition-colors ${
+                      user.enabled
+                        ? "text-amber-600 hover:bg-amber-50"
+                        : "text-emerald-600 hover:bg-emerald-50"
+                    }`}
+                    title={user.enabled ? "Block user" : "Unblock user"}
                   >
                     <Power size={16} />
+                    <span>{user.enabled ? "Block" : "Unblock"}</span>
                   </button>
                   <button
                     onClick={() => onDelete(user.id)}

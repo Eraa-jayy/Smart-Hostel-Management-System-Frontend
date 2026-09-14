@@ -1,12 +1,28 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import StudentSidebar from "../components/StudentSidebar";
 import StudentNavbar from "../components/StudentNavbar";
+import { getMyRoomDetails } from "../service/studentAllocationService";
 
 export default function StudentLayout() {
   const navigate = useNavigate();
 
-  const studentName = localStorage.getItem("fullName") || "Student";
+  const [studentName, setStudentName] = useState(
+    localStorage.getItem("fullName") || localStorage.getItem("username") || "Student"
+  );
+
+  useEffect(() => {
+    getMyRoomDetails()
+      .then(({ data }) => {
+        if (data?.fullName) {
+          setStudentName(data.fullName);
+          localStorage.setItem("fullName", data.fullName);
+        }
+      })
+      .catch((error) => {
+        console.error("Unable to load student profile name:", error);
+      });
+  }, []);
 
   const handleLogout = () => {
     localStorage.clear();

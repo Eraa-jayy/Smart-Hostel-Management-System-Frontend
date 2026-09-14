@@ -7,7 +7,6 @@ import {
   XCircle,
   Search,
   ClipboardCheck,
-  RefreshCw,
   MessageSquare,
   ImageIcon,
   ZoomIn,
@@ -123,26 +122,19 @@ export default function Complaints() {
   const categories = ["all", ...new Set(complaints.map((c) => c.category))];
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-5 sm:space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Complaints & Maintenance</h1>
+          <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">Complaints & Maintenance</h1>
           <p className="text-sm text-gray-400 mt-0.5">
             Review complaints raised by students. Forward maintenance issues to the technical unit or decline incorrect reports.
           </p>
         </div>
-        <button
-          onClick={loadData}
-          className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
-        >
-          <RefreshCw size={13} />
-          Refresh
-        </button>
       </div>
 
       {/* Stats row */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-5 sm:gap-4">
         {[
           { label: "All complaints", count: totalCount, bg: "bg-gray-50", text: "text-gray-700", icon: ClipboardCheck },
           { label: "Pending Action", count: pendingCount, bg: "bg-amber-50", text: "text-amber-700", icon: Clock },
@@ -202,7 +194,7 @@ export default function Complaints() {
           />
         </div>
 
-        <select
+        {/* <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
           className="px-3 py-2.5 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none"
@@ -213,7 +205,7 @@ export default function Complaints() {
               {cat}
             </option>
           ))}
-        </select>
+        </select> */}
       </div>
 
       {/* Complaints list */}

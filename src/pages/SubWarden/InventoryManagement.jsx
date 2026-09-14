@@ -12,6 +12,7 @@ import {
   Bed,
   Armchair,
   FolderOpen,
+  Plus,
 } from "lucide-react";
 import {
   getHostelConfig,
@@ -45,6 +46,13 @@ export default function InventoryManagement() {
   const [editValues, setEditValues] = useState({}); // Stores working/damaged counts for items
   const [bulkEditItem, setBulkEditItem] = useState(null);
   const [bulkEditValue, setBulkEditValue] = useState(0);
+  const [isAddingInventory, setIsAddingInventory] = useState(false);
+  const [newInventory, setNewInventory] = useState({
+    roomNo: "",
+    itemKey: ITEM_TYPES[0].key,
+    working: 0,
+    damaged: 0,
+  });
 
   useEffect(() => {
     loadData();
@@ -150,6 +158,42 @@ export default function InventoryManagement() {
     alert(`Inventory for Room ${editingRoom} updated successfully`);
   };
 
+  const handleAddInventory = (e) => {
+    e.preventDefault();
+    const roomNo = newInventory.roomNo;
+    const working = Math.max(0, Number(newInventory.working) || 0);
+    const damaged = Math.max(0, Number(newInventory.damaged) || 0);
+
+    if (!roomNo || !inventory[roomNo]) {
+      alert("Please select a valid room.");
+      return;
+    }
+
+    const updatedInventory = {
+      ...inventory,
+      [roomNo]: {
+        ...inventory[roomNo],
+        [newInventory.itemKey]: {
+          ...(inventory[roomNo][newInventory.itemKey] || {}),
+          count: working + damaged,
+          working,
+          damaged,
+        },
+      },
+    };
+
+    localStorage.setItem("sw_inventory", JSON.stringify(updatedInventory));
+    setInventory(updatedInventory);
+    setNewInventory({
+      roomNo: "",
+      itemKey: ITEM_TYPES[0].key,
+      working: 0,
+      damaged: 0,
+    });
+    setIsAddingInventory(false);
+    alert("New inventory item added successfully.");
+  };
+
   if (!config) {
     return <div className="text-center p-10">Loading inventory configuration...</div>;
   }
@@ -198,14 +242,24 @@ export default function InventoryManagement() {
     <div className="space-y-6">
       {/* Header */}
       <div className="space-y-1">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Inventory Management</h1>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Inventory Management</h1>
+          <button
+            type="button"
+            onClick={() => setIsAddingInventory(true)}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-bold text-white transition hover:bg-indigo-700"
+          >
+            <Plus size={15} />
+            Add New Inventory
+          </button>
+        </div>
         <p className="text-xs sm:text-sm text-gray-400 mt-0.5 leading-relaxed">
           Inspect, manage, and edit room facilities (Beds, fans, bulbs, chairs, desks, cupboards, mattresses, and bed boards) across all floors.
         </p>
       </div>
 
       {/* Aggregate breakdown */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3.5">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-3.5 lg:grid-cols-4 xl:grid-cols-8">
         {ITEM_TYPES.map(({ key, name, icon: Icon }) => {
           const stats = summaryStats[key];
           const hasDamaged = stats.damaged > 0;
@@ -432,6 +486,70 @@ export default function InventoryManagement() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {isAddingInventory && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/60 p-3 backdrop-blur-xs">
+          <div className="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl">
+            <div className="flex items-start justify-between gap-3 bg-gradient-to-r from-indigo-700 to-indigo-800 p-4 text-white sm:p-5">
+              <div>
+                <h3 className="text-base font-extrabold sm:text-lg">Add New Inventory</h3>
+                <p className="mt-1 text-[11px] text-indigo-100 sm:text-xs">
+                  Add or replace an inventory item for a selected room.
+                </p>
+              </div>
+              <button type="button" onClick={() => setIsAddingInventory(false)} className="text-indigo-200 hover:text-white">
+                <X size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleAddInventory} className="space-y-4 p-4 sm:p-6">
+              <div>
+                <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wide text-gray-500">Room</label>
+                <select
+                  required
+                  value={newInventory.roomNo}
+                  onChange={(e) => setNewInventory({ ...newInventory, roomNo: e.target.value })}
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                >
+                  <option value="">Select room</option>
+                  {roomsList.map((roomNo) => <option key={roomNo} value={roomNo}>Room {roomNo}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wide text-gray-500">Inventory Type</label>
+                <select
+                  value={newInventory.itemKey}
+                  onChange={(e) => setNewInventory({ ...newInventory, itemKey: e.target.value })}
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                >
+                  {ITEM_TYPES.map(({ key, name }) => <option key={key} value={key}>{name}</option>)}
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {["working", "damaged"].map((field) => (
+                  <div key={field}>
+                    <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wide text-gray-500">{field}</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={newInventory[field]}
+                      onChange={(e) => setNewInventory({ ...newInventory, [field]: e.target.value })}
+                      className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="flex flex-col-reverse gap-3 border-t border-gray-100 pt-4 sm:flex-row sm:justify-end">
+                <button type="button" onClick={() => setIsAddingInventory(false)} className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-xs font-bold text-gray-500 hover:bg-gray-50 sm:w-auto">
+                  Cancel
+                </button>
+                <button type="submit" className="w-full rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-bold text-white hover:bg-indigo-700 sm:w-auto">
+                  Add Inventory
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

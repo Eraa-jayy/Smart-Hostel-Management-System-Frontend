@@ -117,6 +117,10 @@ const MaintenanceLayout = lazy(() => import("./layout/MaintenanceLayout.jsx"));
 const MaintenanceComplaints = lazy(() => import("./pages/Maintenance/Complaints.jsx"));
 const MaintenanceHistory = lazy(() => import("./pages/Maintenance/History.jsx"));
 
+const Announcements = lazy(() =>
+  import("./pages/studentAffairs/Announcements.jsx")
+);
+
 /* =========================
    SYSTEM ADMIN MODULE
 ========================= */
@@ -178,6 +182,7 @@ export default function App() {
             <Route path="allocations" element={<Allocations />} />
             <Route path="complaints" element={<ComplaintStatus />} />
             <Route path ="student/:id" element={<StudentProfile/>}/>
+           <Route path="Announcement" element={<Announcements />} />
             </Route>
 
             <Route path="/maintenance" element={<ProtectedRoute allowedRole="MAINTENANCE"><MaintenanceLayout /></ProtectedRoute>}>

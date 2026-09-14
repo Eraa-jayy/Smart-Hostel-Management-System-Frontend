@@ -32,6 +32,7 @@ export default function Complaints() {
   const [selected, setSelected] = useState(null);
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
+
   const [lightboxUrl, setLightboxUrl] = useState(null);
 
   // Detail modal state
@@ -525,4 +526,5 @@ export default function Complaints() {
       )}
     </div>
   );
+
 }

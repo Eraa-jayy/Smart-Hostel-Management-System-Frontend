@@ -8,6 +8,7 @@ import {
   Bed,
   FileText,
   Bell,
+  Megaphone,
   MessageSquareWarning,
   LogOut,
 } from "lucide-react";
@@ -51,6 +52,11 @@ export default function Sidebar({ onOpenProfile, profileImage }) {
       name: "Complaint Status",
       path: "/student-affairs/complaints",
       icon: MessageSquareWarning,
+    },
+    {
+      name: "Announcements",
+      path: "/student-affairs/announcements",
+      icon: Megaphone,
     },
     {
       name: "Reports",

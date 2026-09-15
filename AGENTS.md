@@ -29,12 +29,12 @@ There is no lint, typecheck, or test command.
 
 **Entry point:** `src/main.jsx` -> `src/App.jsx` (all routes defined here with `react-router-dom` v6).
 
-**Auth:** Token and role stored in `localStorage`. Axios interceptor in `src/service/axios.js` attaches `Bearer` token. Backend expected at `http://localhost:8080/api` (hardcoded).
+**Auth:** `LoginPage` calls POST `/auth/login`, then stores `token`, `username`, `role`, `fullName` in `localStorage`. `forcePasswordChange: true` redirects to `/change-password` (a public route, NOT behind `ProtectedRoute`). Axios interceptor in `src/service/axios.js` attaches `Bearer` token but **skips `/auth/login`**. Backend expected at `http://localhost:8080/api` (hardcoded). `WARDEN` role is handled in the login redirect switch but has no route/layout.
 
 ## Conventions
 
 - **All pages are lazy-loaded** with `React.lazy` + `Suspense`. Public pages (HomePage, LoginPage, About) have an artificial 2-second delay.
-- **Directory typo:** Image assets are in `src/assests/` (misspelled), not `src/assets/`. Preserve this.
+- **Typos to preserve:** Image assets live in `src/assests/` (misspelled), and the room service file is `src/service/roomSercive.js` (misspelled) — not `assets`/`roomService`.
 - **Icons:** `lucide-react` throughout.
 - **Custom brand colors** override Tailwind's `blue`, `indigo`, `violet`, `purple`, `orange`, `amber`, `emerald`, `teal`, `green`, `red`, `gray`, `slate` palettes with a single `uniNestPalette` in `tailwind.config.js`. Use `brand-500` for the primary brand color (`#212880`).
 - **CSS hacks in `index.css`** override hardcoded hex colors (`#0a0f1e`, `#101c5c`, `#000080`, etc.) to `var(--un-primary)`. Prefer using Tailwind brand classes; the CSS overrides exist for legacy inline styles.
@@ -44,7 +44,7 @@ There is no lint, typecheck, or test command.
 ## Gotchas
 
 - Role matching in `ProtectedRoute` normalizes by stripping underscores and uppercasing (`SUB_WARDEN` -> `SUBWARDEN`).
-- `LoginPage` logs credentials to console — no real auth endpoint is wired yet.
+- `LoginPage` logs the login response and full username/password to the console (lines ~53-94) — dev leftover, do not rely on it.
 - Content arrays (hostels, services, announcements) are hardcoded in `HomePage.jsx` — not from an API.
 - Several pages are empty shells (0 bytes): `src/pages/studentAffairs/Notifications.jsx`, `src/pages/studentAffairs/Reports.jsx`, `src/components/studentAffairs/Topbar.jsx`.
 - No `.gitignore` exists — `node_modules` and `dist/` are tracked unless added.

@@ -58,11 +58,7 @@ export default function Sidebar({ onOpenProfile, profileImage }) {
       path: "/student-affairs/announcements",
       icon: Megaphone,
     },
-    {
-      name: "Reports",
-      path: "/student-affairs/reports",
-      icon: FileText,
-    },
+    
     {
       name: "Notifications",
       path: "/student-affairs/notifications",

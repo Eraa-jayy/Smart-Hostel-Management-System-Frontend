@@ -5,8 +5,9 @@ import {
   createBuilding,
   getAllBuildings,
   getBuildingById,
+  deleteBuilding,
 } from "../../service/buildingService";
-import { Building2, Layers, DoorOpen, Users, Plus, X } from "lucide-react";
+import { Building2, Layers, DoorOpen, Users, Plus, X, Trash2 } from "lucide-react";
 
 export default function ManageHostel() {
   const { id } = useParams();
@@ -92,6 +93,26 @@ export default function ManageHostel() {
     } catch (error) {
       console.log(error);
       alert("Building creation failed");
+    }
+  };
+
+  const handleDeleteBuilding = async (buildingId) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this building? All floors and rooms will be removed."
+    );
+    if (!confirmDelete) return;
+
+    try {
+      await deleteBuilding(buildingId);
+      alert("Building deleted successfully");
+      loadBuildings();
+      loadHostel();
+    } catch (error) {
+      console.log(error);
+      alert(
+        error.response?.data?.message ||
+          "Failed to delete building. Make sure it has no linked rooms or allocations."
+      );
     }
   };
 
@@ -253,6 +274,13 @@ export default function ManageHostel() {
                           {building.description || "Hostel Building"}
                         </p>
                       </div>
+                      <button
+                        onClick={() => handleDeleteBuilding(building.id)}
+                        title="Delete Building"
+                        className="text-white/70 hover:text-red-200 hover:bg-white/10 p-2 rounded-lg transition-colors"
+                      >
+                        <Trash2 size={16} />
+                      </button>
                     </div>
                   </div>
 

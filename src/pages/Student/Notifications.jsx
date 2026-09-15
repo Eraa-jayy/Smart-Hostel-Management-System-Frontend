@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
 import {
   Megaphone,
-  Info,
   CalendarDays,
   Clock,
   ChevronRight,
   Bell,
-  Filter,
+  Check,
+  RotateCcw,
   Eye,
-  EyeOff,
 } from "lucide-react";
 import api from "../../service/axios";
 
@@ -39,8 +38,7 @@ export default function Announcements() {
   const [raw, setRaw] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [filter, setFilter] = useState("all");
-  const [showUnreadOnly, setShowUnreadOnly] = useState(false);
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -56,6 +54,28 @@ export default function Announcements() {
       }
     })();
   }, []);
+
+  const handleMarkAsRead = async (id) => {
+    try {
+      await api.post(`/announcements/${id}/read`);
+      setRaw((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, read: true } : a))
+      );
+    } catch {
+      console.error("Failed to mark announcement as read");
+    }
+  };
+
+  const handleMarkAsUnread = async (id) => {
+    try {
+      await api.post(`/announcements/${id}/unread`);
+      setRaw((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, read: false } : a))
+      );
+    } catch {
+      console.error("Failed to mark announcement as unread");
+    }
+  };
 
   const mapped = raw.map((a) => ({
     id: a.id,
@@ -75,16 +95,10 @@ export default function Announcements() {
       (a.priority || "").toLowerCase() === "important"
         ? "important"
         : "info",
-    read: false,
+    read: a.read || false,
   }));
 
-  let filtered = mapped;
-  if (filter !== "all") {
-    filtered = filtered.filter((a) => a.priority === filter);
-  }
-  if (showUnreadOnly) {
-    filtered = filtered.filter((a) => !a.read);
-  }
+  const filtered = mapped;
 
   return (
     <div className="space-y-6">
@@ -113,7 +127,7 @@ export default function Announcements() {
       {!loading && !error && (
         <>
           {/* ── Stats Row ── */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             {[
               {
                 label: "Total Notices",
@@ -121,6 +135,13 @@ export default function Announcements() {
                 icon: Megaphone,
                 bg: "bg-gray-50",
                 iconColor: "text-gray-600",
+              },
+              {
+                label: "Read",
+                value: mapped.filter((a) => a.read).length,
+                icon: Check,
+                bg: "bg-emerald-50",
+                iconColor: "text-emerald-600",
               },
               {
                 label: "Unread",
@@ -149,51 +170,6 @@ export default function Announcements() {
             ))}
           </div>
 
-          {/* ── Filter Bar ── */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-2 flex-wrap">
-              <div className="flex items-center gap-2 text-sm text-gray-500 mr-1">
-                <Filter size={15} />
-                <span className="text-[12px] font-medium">Filter:</span>
-              </div>
-              {[
-                { value: "all", label: "All" },
-                { value: "important", label: "Important" },
-                { value: "info", label: "Info" },
-              ].map(({ value, label }) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => setFilter(value)}
-                  className={`px-3 py-1.5 text-[12px] font-medium rounded-lg transition-all duration-200 ${
-                    filter === value
-                      ? "bg-gray-900 text-white shadow-sm"
-                      : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setShowUnreadOnly((prev) => !prev)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-medium rounded-lg transition-all duration-200 ${
-                showUnreadOnly
-                  ? "bg-blue-50 text-blue-600 border border-blue-200"
-                  : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-              }`}
-            >
-              {showUnreadOnly ? (
-                <EyeOff size={13} />
-              ) : (
-                <Eye size={13} />
-              )}
-              {showUnreadOnly ? "Show All" : "Unread Only"}
-            </button>
-          </div>
-
           {/* ── Announcement Cards ── */}
           <div className="space-y-3">
             {filtered.map((announcement) => {
@@ -202,7 +178,9 @@ export default function Announcements() {
               return (
                 <div
                   key={announcement.id}
-                  className={`bg-white rounded-2xl border border-gray-100 border-l-4 ${pr.border} overflow-hidden hover:shadow-md hover:border-gray-200 transition-all duration-200`}
+                  className={`bg-white rounded-2xl border border-gray-100 border-l-4 ${pr.border} overflow-hidden hover:shadow-md hover:border-gray-200 transition-all duration-200 ${
+                    announcement.read ? "opacity-75" : ""
+                  }`}
                 >
                   <div className="p-5">
                     <div className="flex items-start justify-between gap-3">
@@ -248,17 +226,57 @@ export default function Announcements() {
                       />
                     </div>
 
-                    <div className="flex items-center gap-4 mt-4 pt-3 border-t border-gray-50">
-                      <span className="flex items-center gap-1 text-[11px] text-gray-400">
-                        <CalendarDays size={10} />
-                        {announcement.date}
-                      </span>
-                      {announcement.time && (
+                    <div className="flex items-center justify-between gap-4 mt-4 pt-3 border-t border-gray-50">
+                      <div className="flex items-center gap-4">
                         <span className="flex items-center gap-1 text-[11px] text-gray-400">
-                          <Clock size={10} />
-                          {announcement.time}
+                          <CalendarDays size={10} />
+                          {announcement.date}
                         </span>
-                      )}
+                        {announcement.time && (
+                          <span className="flex items-center gap-1 text-[11px] text-gray-400">
+                            <Clock size={10} />
+                            {announcement.time}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (!announcement.read) {
+                              handleMarkAsRead(announcement.id);
+                            }
+                            setSelectedAnnouncement(announcement);
+                          }}
+                          className="flex items-center gap-1 text-[11px] font-semibold text-gray-500 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 px-2.5 py-1 rounded-lg transition-colors"
+                        >
+                          <Eye size={12} />
+                          Read
+                        </button>
+                        {!announcement.read ? (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleMarkAsRead(announcement.id);
+                            }}
+                            className="flex items-center gap-1 text-[11px] font-semibold text-brand-600 hover:text-brand-700 bg-brand-50 hover:bg-brand-100 px-2.5 py-1 rounded-lg transition-colors"
+                          >
+                            <Check size={12} />
+                            Mark as read
+                          </button>
+                        ) : (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleMarkAsUnread(announcement.id);
+                            }}
+                            className="flex items-center gap-1 text-[11px] font-semibold text-gray-500 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 px-2.5 py-1 rounded-lg transition-colors"
+                          >
+                            <RotateCcw size={12} />
+                            Mark as unread
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -275,13 +293,98 @@ export default function Announcements() {
                 </div>
                 <p className="text-sm text-gray-400">No announcements found</p>
                 <p className="text-[11px] text-gray-300 mt-1">
-                  Try adjusting your filters
+                  Check back later for new notices
                 </p>
               </div>
             )}
           </div>
         </>
       )}
+
+      {selectedAnnouncement && (() => {
+        const live =
+          mapped.find((a) => a.id === selectedAnnouncement.id) ||
+          selectedAnnouncement;
+        const pr =
+          PRIORITY_CONFIG[live.priority] || PRIORITY_CONFIG.info;
+        return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+            <div className="mb-5 flex items-start justify-between gap-3">
+              <h2 className="text-lg font-semibold text-gray-800">
+                {live.title}
+              </h2>
+              <button
+                type="button"
+                onClick={() => setSelectedAnnouncement(null)}
+                className="text-xl text-slate-400 hover:text-slate-600"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="mb-1 block text-sm font-medium text-slate-700">
+                  Message
+                </label>
+                <p className="w-full rounded-lg border border-slate-200 bg-gray-50 px-3 py-2 text-sm leading-relaxed text-slate-700">
+                  {live.description}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 flex-wrap">
+                <span
+                  className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${pr.color}`}
+                >
+                  {pr.label}
+                </span>
+                <span
+                  className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                    CATEGORY_COLORS[live.category] ||
+                    "bg-gray-100 text-gray-600"
+                  }`}
+                >
+                  {live.category}
+                </span>
+                <span className="flex items-center gap-1 text-[11px] text-gray-400">
+                  <CalendarDays size={10} />
+                  {live.date}
+                </span>
+                {live.time && (
+                  <span className="flex items-center gap-1 text-[11px] text-gray-400">
+                    <Clock size={10} />
+                    {live.time}
+                  </span>
+                )}
+              </div>
+
+              <div className="flex justify-end gap-3 pt-2">
+                {!live.read && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleMarkAsRead(live.id);
+                    }}
+                    className="flex items-center gap-1 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
+                  >
+                    <Check size={14} />
+                    Mark as read
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setSelectedAnnouncement(null)}
+                  className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        );
+      })()}
     </div>
   );
 }

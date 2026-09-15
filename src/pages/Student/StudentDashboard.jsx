@@ -5,6 +5,7 @@ import {
   DoorOpen,
   Wrench,
   Megaphone,
+  Bell,
   CreditCard,
   TrendingUp,
   TrendingDown,
@@ -19,6 +20,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { getMyRoomDetails } from "../../service/studentAllocationService";
+import api from "../../service/axios";
 
 /* ── Navigation Shortcuts ── */
 const ACTIONS = [
@@ -49,16 +51,12 @@ export default function StudentDashboard() {
       const roomRes = await getMyRoomDetails();
       setRoomData(roomRes.data);
 
-      // TODO: Connect API services when backend endpoints are ready:
-      // const activityRes = await getMyRecentActivity();
-      // const paymentsRes = await getMyRecentPayments();
-      // const announcementsRes = await getLatestAnnouncements();
-      // const facilitiesRes = await getFacilitiesStatus();
-      // const pendingRes = await getPendingRequestsCount();
+      // Connect API services:
+      const announcementsRes = await api.get("/announcements");
+      setAnnouncements(announcementsRes.data);
 
       setRecentActivity([]);
       setRecentPayments([]);
-      setAnnouncements([]);
       setFacilities([]);
       setPendingRequestsCount(0);
     } catch (err) {
@@ -80,6 +78,7 @@ export default function StudentDashboard() {
   };
 
   const studentName = roomData?.fullName || "Student";
+  const totalCount = announcements.length;
   const unreadCount = announcements.filter((a) => !a.read).length;
 
   const STATS = [
@@ -114,10 +113,20 @@ export default function StudentDashboard() {
       up: true,
     },
     {
+      label: "Total Notices",
+      value: totalCount.toString(),
+      sub: totalCount > 0 ? "Live on Portal" : "No Notices Yet",
+      icon: Megaphone,
+      accent: "from-sky-500 to-blue-600",
+      lightBg: "bg-sky-50/80 text-sky-600",
+      change: `${totalCount} Posted`,
+      up: true,
+    },
+    {
       label: "Unread Notices",
       value: unreadCount.toString(),
       sub: "Hostel Circulars",
-      icon: Megaphone,
+      icon: Bell,
       accent: "from-violet-500 to-purple-600",
       lightBg: "bg-violet-50/80 text-violet-600",
       change: unreadCount > 0 ? "New" : "0 New",
@@ -166,7 +175,7 @@ export default function StudentDashboard() {
       </div>
 
       {/* ── Key Metrics Cards ── */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {STATS.map(({ label, value, sub, icon: Icon, accent, lightBg, change, up }) => (
           <div
             key={label}
@@ -402,25 +411,34 @@ export default function StudentDashboard() {
           </div>
           <div className="space-y-3">
             {announcements.length > 0 ? (
-              announcements.map(({ title, date, tag }) => (
-                <div
-                  key={title}
-                  className="group flex items-center justify-between rounded-xl border border-slate-100 p-3.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-200 hover:shadow-md"
-                >
-                  <div className="min-w-0 flex-1 pr-3">
-                    {tag && (
-                      <span className="inline-block rounded-md border border-slate-200 bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-700">
-                        {tag}
-                      </span>
-                    )}
-                    <p className="mt-1.5 line-clamp-1 text-xs font-bold text-slate-800 transition-colors group-hover:text-indigo-600">
-                      {title}
-                    </p>
-                    <p className="mt-1 text-[11px] text-slate-400">{date}</p>
+              announcements.slice(0, 4).map((announcement) => {
+                const date = announcement.createdAt
+                  ? new Date(announcement.createdAt).toLocaleDateString()
+                  : "N/A";
+                const category = announcement.category || "General";
+                return (
+                  <div
+                    key={announcement.id}
+                    className="group flex items-center justify-between rounded-xl border border-slate-100 p-3.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-200 hover:shadow-md"
+                  >
+                    <div className="flex min-w-0 items-start gap-2.5 pr-3 flex-1">
+                      {!announcement.read && (
+                        <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-violet-500" />
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <span className="inline-block rounded-md border border-slate-200 bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-700">
+                          {category}
+                        </span>
+                        <p className="mt-1.5 line-clamp-1 text-xs font-bold text-slate-800 transition-colors group-hover:text-indigo-600">
+                          {announcement.title}
+                        </p>
+                        <p className="mt-1 text-[11px] text-slate-400">{date}</p>
+                      </div>
+                    </div>
+                    <ChevronRight size={16} className="flex-shrink-0 text-slate-300 transition-transform group-hover:translate-x-1 group-hover:text-indigo-500" />
                   </div>
-                  <ChevronRight size={16} className="flex-shrink-0 text-slate-300 transition-transform group-hover:translate-x-1 group-hover:text-indigo-500" />
-                </div>
-              ))
+                );
+              })
             ) : (
               <div className="py-8 text-center">
                 <p className="text-xs text-slate-400">No announcements posted.</p>

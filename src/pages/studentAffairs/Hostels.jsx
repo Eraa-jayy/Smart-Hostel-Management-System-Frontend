@@ -15,7 +15,6 @@ export default function Hostel() {
     hostelName: "",
     hostelType: "",
     location: "",
-    totalCapacity: "",
   });
   const [showForm, setShowForm] = useState(false);
 
@@ -43,10 +42,9 @@ export default function Hostel() {
         hostelName: hostelData.hostelName,
         hostelType: hostelData.hostelType,
         location: hostelData.location,
-        totalCapacity: Number(hostelData.totalCapacity),
       });
       alert("Hostel created successfully");
-      setHostelData({ hostelName: "", hostelType: "", location: "", totalCapacity: "" });
+      setHostelData({ hostelName: "", hostelType: "", location: "" });
       setShowForm(false);
       loadHostels();
     } catch (error) {
@@ -120,15 +118,6 @@ export default function Hostel() {
                 name="location"
                 placeholder="Location"
                 value={hostelData.location}
-                onChange={handleChange}
-                className="border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
-                required
-              />
-              <input
-                type="number"
-                name="totalCapacity"
-                placeholder="Capacity"
-                value={hostelData.totalCapacity}
                 onChange={handleChange}
                 className="border border-gray-200 p-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
                 required

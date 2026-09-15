@@ -15,7 +15,6 @@ const Announcement = () => {
   const [editingAnnouncement, setEditingAnnouncement] = useState(null);
 
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("All");
  
 
   const [showForm, setShowForm] = useState(false);
@@ -284,7 +283,7 @@ const Announcement = () => {
   };
 
   // =====================================================
-  // SEARCH + CATEGORY FILTER
+  // SEARCH FILTER
   // =====================================================
 
   const filteredAnnouncements =
@@ -305,14 +304,7 @@ const Announcement = () => {
           .toLowerCase()
           .includes(search.toLowerCase());
 
-      const matchesCategory =
-        category === "All" ||
-        announcement.category === category;
-
-      return (
-        matchesSearch &&
-        matchesCategory
-      );
+      return matchesSearch;
     });
 
   // =====================================================
@@ -548,7 +540,7 @@ const Announcement = () => {
 
 
       {/* =====================================================
-          SEARCH + FILTER
+          SEARCH
       ===================================================== */}
 
       <div className="mb-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -574,43 +566,6 @@ const Announcement = () => {
             />
 
           </div>
-
-
-          {/* Category */}
-
-          <select
-            value={category}
-            onChange={(e) =>
-              setCategory(e.target.value)
-            }
-            className="rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-600 outline-none focus:border-blue-500"
-          >
-
-            <option value="All">
-              All Categories
-            </option>
-
-            <option value="General">
-              General
-            </option>
-
-            <option value="Maintenance">
-              Maintenance
-            </option>
-
-            <option value="Canteen">
-              Canteen
-            </option>
-
-            <option value="Academic">
-              Academic
-            </option>
-
-            <option value="Hostel">
-              Hostel
-            </option>
-
-          </select>
 
         </div>
 

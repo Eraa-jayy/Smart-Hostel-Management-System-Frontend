@@ -69,7 +69,10 @@ export default function Hostel() {
       loadHostels();
     } catch (error) {
       console.log(error);
-      alert("Failed to delete hostel. Make sure it has no linked buildings.");
+      const message =
+        error.response?.data?.message ||
+        "Failed to delete hostel. Make sure it has no linked buildings.";
+      alert(message);
     }
   };
 
